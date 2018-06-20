@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% block content%}
+
+<div class="jumbotron text-center">
+  <h1 class="display-3">Riddle Me These</h1>
+  <p class="lead">This is a simple riddle game. You will be faced by riddles after riddles; do you have what it takes to achieve top scores? Get started by entering your player name below!</p>
+</div>
+
+<div class="container-fluid" id="login">
+    <form class="form-inline justify-content-center" method="POST">
+      <label for="name">Player name:</label>
+      <input type="text" name="name" id="name" />
+      <button class="btn btn-success">Game Start!</button>
+    </form>
+</div>
+
+{% endblock %}
