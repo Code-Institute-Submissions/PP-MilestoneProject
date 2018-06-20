@@ -32,6 +32,11 @@
 
 ## Change Log
 
+### 20/06/2018 15:21
+- Added HTML templates.
+- index.html implemented (UI only). 
+- Added run.py (init script for the application) and its test script test_run.py.
+
 ### 20/06/2018
 - Riddles base (as json file) has been added. A new attribute "type" is added to each riddle. This is due to the fact that the application needs to identify what type of riddle has been chosen and use appropriate HTML to display the riddle correctly.
 
