@@ -32,6 +32,10 @@
 
 ## Change Log
 
+### 23/06/2018
+- Partial implementation of player.html
+- Player login function implemented (without uniqueness check)
+
 ### 20/06/2018 15:21
 - Added HTML templates.
 - index.html implemented (UI only). 
@@ -43,3 +47,29 @@
 *****
 
 ## <a name="Testing"></a>Testing
+
+### Writing to player.json
+For a starter the following pseudo code is used to test if data written to player.json as expected.
+```python
+def write_to_player_json():
+    player = {"player_name": "dummy_player", "score": 0}
+    with open('data/player.json') as f:
+        data = json.load(f)
+    
+    data.append(player)
+    
+    with open('data/player.json', 'w') as f:
+        json.dump(data, f)
+```
+And to test it:
+```python
+def test_write_to_player_json(self):
+    with open('data/dummy_player.json', 'w') as f:
+        json.dump([], f)
+    for x in range(5):
+        write_to_player_json()
+    with open('data/dummy_player.json', 'r') as f:
+        data = json.load(f)
+        self.assertEqual(len(data), 5)
+```
+The reason why the function was called multiple times is to make sure new data is appended to player.json instead of overwritting the whole file. The function will be updated to take two parameters of player_name and file_name instead of hard-coded data.
