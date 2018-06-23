@@ -36,13 +36,17 @@
 - Partial implementation of player.html
 - Player login function implemented (without uniqueness check)
 
-### 20/06/2018 15:21
+#### 14:26
+- Template output for player.html implemented. This template will show when user attemp to change route/url directly instead of using form to login.
+
+### 20/06/2018
+- Riddles base (as json file) has been added. A new attribute "type" is added to each riddle. This is due to the fact that the application needs to identify what type of riddle has been chosen and use appropriate HTML to display the riddle correctly.
+
+#### 15:21
 - Added HTML templates.
 - index.html implemented (UI only). 
 - Added run.py (init script for the application) and its test script test_run.py.
 
-### 20/06/2018
-- Riddles base (as json file) has been added. A new attribute "type" is added to each riddle. This is due to the fact that the application needs to identify what type of riddle has been chosen and use appropriate HTML to display the riddle correctly.
 
 *****
 
@@ -64,11 +68,11 @@ def write_to_player_json():
 And to test it:
 ```python
 def test_write_to_player_json(self):
-    with open('data/dummy_player.json', 'w') as f:
+    with open('data/player.json', 'w') as f:
         json.dump([], f)
     for x in range(5):
         write_to_player_json()
-    with open('data/dummy_player.json', 'r') as f:
+    with open('data/player.json', 'r') as f:
         data = json.load(f)
         self.assertEqual(len(data), 5)
 ```
