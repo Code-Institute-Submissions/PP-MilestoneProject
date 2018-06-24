@@ -1,0 +1,9 @@
+{% extends 'base.html' %} {% block content%}
+
+<div class="jumbotron text-center">
+  <h1 class="display-3">Welcome, {{ player.player_name }}</h1>
+  <h2>Your current score is {{ player.score }}</h2>
+  <p class="lead">Your challenges begins, answer as many riddles as you can! Feel free to headback to your player page at anytime.</p>
+</div>
+
+{% endblock %}
