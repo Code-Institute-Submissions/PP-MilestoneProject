@@ -1,6 +1,7 @@
 import os
 import json
 from flask import Flask, redirect, render_template, request
+import random
 
 app = Flask(__name__)
 
@@ -41,6 +42,11 @@ def is_new_player(player_name, file_name):
             return False
         else:
             return True
+            
+def get_riddle(file_name):
+    with open(file_name, 'r') as f:
+        data = json.load(f)
+    return random.choice(data)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -59,7 +65,8 @@ def player(player_name):
 @app.route('/<player_name>/riddles')
 def riddles(player_name):
     player_detail = read_player_detail(player_name, 'data/player.json')
-    return render_template("riddles.html", player=player_detail)
+    riddle = get_riddle('data/riddles.json')
+    return render_template("riddles.html", player=player_detail, riddle=riddle)
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
