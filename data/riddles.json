@@ -1,50 +1,56 @@
 [{
-    "Type": "text",
+    "type": "text",
     "Q": "I’M THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?",
     "A": "Ice"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "WHAT BELONGS TO YOU BUT OTHERS USE IT MORE THAN YOU DO?",
     "A": "Name"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "DAVID’S FATHER HAS THREE SONS: SNAP, CRACKLE AND ?",
     "A": "David"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "WHAT SITS IN A CORNER WHILE TRAVELING ALL AROUND THE WORLD?",
     "A": "Stamp"
   },
   {
-    "Type": "image",
-    "Q": "static/image/triangles-1.jpg",
+    "type": "image",
+    "Q": {
+      "Q": "HOW MANY TRIANGLES ARE THERE IN THE IMAGE?",
+      "I": "/static/image/triangles-1.jpg"
+    },
     "A": "40"
   },
   {
-    "Type": "image",
-    "Q": "static/image/missing-number-1.jpg",
+    "type": "image",
+    "Q": {
+      "Q": "WHAT IS THE MISSING NUMBER IN THE IMAGE?",
+      "I": "/static/image/missing-number-1.jpg"
+    },
     "A": "6"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "WHAT DO YOU GET WHEN YOU CROSS AN AUTOMOBILE WITH A HOUSEHOLD ANIMAL?",
     "A": "Carpet"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "WHAT FIVE-LETTER WORD BECOMES SHORTER WHEN YOU ADD TWO LETTERS TO IT?",
     "A": "Short"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "LIVES WITHOUT A BODY, HEARS WITHOUT EARS, SPEAKS WITHOUT A MOUTH, TO WHICH THE AIR ALONE GIVES BIRTH. WHAT IS IT?",
     "A": "Echo"
   },
   {
-    "Type": "text",
+    "type": "text",
     "Q": "WHAT HAS NO BEGINNING, END, OR MIDDLE?",
     "A": "Doughnut"
   }
