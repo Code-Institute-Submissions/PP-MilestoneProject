@@ -32,6 +32,11 @@
 
 ## Change Log
 
+### 24/06/2018
+- Added player options to player.html in form of buttons.
+- Player login now also does uniquesness check so that no duplicates of player name are allowed in player.json
+- riddles.html template implemented.
+
 ### 23/06/2018
 - Partial implementation of player.html
 - Player login function implemented (without uniqueness check)
@@ -52,7 +57,7 @@
 
 ## <a name="Testing"></a>Testing
 
-### Writing to player.json
+### Data manuipluation with player.json
 For a starter the following pseudo code is used to test if data written to player.json as expected.
 ```python
 def write_to_player_json():
@@ -77,3 +82,5 @@ def test_write_to_player_json(self):
         self.assertEqual(len(data), 5)
 ```
 The reason why the function was called multiple times is to make sure new data is appended to player.json instead of overwritting the whole file. The function will be updated to take two parameters of player_name and file_name instead of hard-coded data.
+
+As the function to identify whether or not a player name entered exists in player.json has been implemented, further tests has been put in place to ensure that the application will not create duplicates of player record in player.json. This serves as the first step of implementing the requirement "Multiple players can play an instance of the game at the same time" where players are identified by a unique player name.
