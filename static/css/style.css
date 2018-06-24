@@ -5,3 +5,10 @@
 #login button {
     margin: 10px;
 }
+
+.player-option {
+    width: 100%;
+    margin-bottom: 10px;
+    padding-left: 40px;
+    padding-right: 40px;
+}
