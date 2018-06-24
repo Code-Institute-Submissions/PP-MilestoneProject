@@ -4,6 +4,28 @@
   <h1 class="display-3">Welcome, {{ player.player_name }}</h1>
   <h2>Your current score is {{ player.score }}</h2>
   <p class="lead">Your challenges begins, answer as many riddles as you can! Feel free to headback to your player page at anytime.</p>
+  <a href="{{ url_for('player', player_name=player.player_name) }}"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      {% if riddle.type=='text' %}
+      <h3 class="text-center">{{ riddle.Q }}</h3>
+      {% else %}
+      <h3 class="text-center">{{ riddle.Q.Q }}</h3>
+      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle"></img>
+      {% endif %}
+    </div>
+  </div>
+  <form class="form-inline form-control-lg justify-content-center" method="POST">
+    <label for="answer">Your answer:</label>
+    <input type="text" name="answer" id="answer" />
+    <button class="btn btn-success btn-lg riddle-button">Submit Answer</button>
+    <a href="{{ url_for('riddles', player_name=player.player_name) }}">
+      <button class="btn btn-danger btn-lg riddle-button">Pass</button>
+    </a>
+  </form>
 </div>
 
 {% endblock %}
