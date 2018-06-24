@@ -1,9 +1,14 @@
 from run import *
 import unittest
 
+#Helper function to clear out player.json
+def reset_json(file_name):
+    with open(file_name, 'w') as f:
+        json.dump([], f)
+
 class testRoute(unittest.TestCase):
     """
-    Test class for routing
+    Test class related to routing
     """
     #To test if Flask is set up correctly
     def test_index(self):
@@ -23,23 +28,29 @@ class testRoute(unittest.TestCase):
         response = tester.get('/dummy_player')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player(guest)' in response.data)
+        
+    #To test if page loads correctly (riddles.html)
+    def test_riddles_loads(self):
+        tester = app.test_client(self)
+        response = tester.get('/dummy_player/riddles')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'Welcome, dummy_player(guest)' in response.data)
+        self.assertTrue(b'Your challenges begins,' in response.data)
 
 
-class testSuite(unittest.TestCase):
+class testPlayerJson(unittest.TestCase):
     """
-    Test suite for this project
+    Test class related to data manipulation with player.json
     """
     
     #To set up player.json before each tests
     def setUp(self):
-        with open('data/player.json', 'w') as f:
-            json.dump([], f)
+        reset_json('data/player.json')
             
     #To remove all data from player.json after all tests
     @classmethod
     def tearDownClass(cls):
-        with open('data/player.json', 'w') as f:
-            json.dump([], f)
+        reset_json('data/player.json')
     
     #To test if data is written to player.json as expected
     def test_write_to_player_json(self):
@@ -78,6 +89,21 @@ class testSuite(unittest.TestCase):
             tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
         data = read_player_json('data/player.json')
         self.assertEqual(len(data), 1)
+    
+    #To test if read_player_detail behaves as expected
+    def test_read_player_detail(self):
+        data = read_player_detail('dummy_player', 'data/player.json')
+        self.assertTrue("(guest)" in data['player_name'])
+        write_to_player_json("dummy_player", 'data/player.json')
+        data = read_player_detail('dummy_player', 'data/player.json')
+        self.assertFalse("(guest)" in data['player_name'])
+
+class testRiddles(unittest.TestCase):
+    """
+    Test class related to retrieving, displaying, and processing riddles
+    """
+    
+    
     
 if __name__ == '__main__':
     unittest.main()
