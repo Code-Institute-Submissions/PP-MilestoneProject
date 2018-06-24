@@ -1,4 +1,5 @@
 # Practical Python Milestone Project
+<details><summary>Details</summary>
 
 - The aim of this project is to build a web application game that asks players to guess the answer to a pictorial or text-based riddle.
 - The player is presented with an image or text that contains the riddle.
@@ -7,10 +8,13 @@
 - Multiple players can play an instance of the game at the same time. Users are identified by a unique username.
 - A leaderboard is also available for users to check their top scores and how they fare against other players.
 
+</details>
+
 *****
 
 ## Technical details
 
+<details><summary>Details</summary>
 - The Application will be styled with Bootstrap based theme and aiming for a responsive design.
 - Riddles will be stored as JSON file. Each "riddle" will consists of the riddle - either as a string if it is text-based, or a URL to an image of it is pictorial. Ability to add new riddles from client side is not part of the requirement so should the riddle base requires update, they will be added to the JSON file directly.
 - Due to requirement of displaying users scores, usernames and their scores will have to be stored in a file (likely on JSON format) on the server. Although this requirement can be achieved without having to store the data in a file (i.e. store data in a dictionary at runtime), such data will be lost if the application crashes. It is therefore more preferable to store these data in a file.
@@ -27,6 +31,8 @@
   4. Users can quit the game at any time at which point the flow will start again from step 1.
 - The application will follow a test-driven development strategy. Any details regarding testing will be provided [HERE](#Testing)
 - Flask framework will be used and the application will be deployed using Heroku.
+
+</details>
 
 *****
 
