@@ -43,6 +43,9 @@
 - Player login now also does uniquesness check so that no duplicates of player name are allowed in player.json
 - riddles.html template implemented.
 
+#### 21:04
+- riddles.html will now display riddle with answer text space below. A new riddle will be chosen randomly on each load.
+
 ### 23/06/2018
 - Partial implementation of player.html
 - Player login function implemented (without uniqueness check)
