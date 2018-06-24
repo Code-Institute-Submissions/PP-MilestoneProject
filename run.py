@@ -8,10 +8,20 @@ def read_player_json(file_name):
     with open(file_name, 'r') as f:
         data = json.load(f)
     return data
+    
+def read_player_detail(player_name, file_name):
+    if zero_player(file_name):
+        return {"player_name": player_name + "(guest)", "score": "place_holder"}
+    else:
+        players = read_player_json('data/player.json')
+        for p in players:
+            if p["player_name"] == player_name:
+                player_detail = p
+                return player_detail
 
 def write_to_player_json(player_name, file_name):
     player = {"player_name": player_name, "score": 0}
-    players =  players = read_player_json('data/player.json')
+    players = read_player_json('data/player.json')
     
     players.append(player)
     
@@ -43,14 +53,13 @@ def index():
     
 @app.route('/<player_name>')
 def player(player_name):
-    player_detail = {"player_name": player_name + "(guest)", "score": "place_holder"}
-    if not zero_player('data/player.json'):
-        players = read_player_json('data/player.json')
-        for p in players:
-            if p["player_name"] == player_name:
-                player_detail = p
-        return render_template("player.html", player=p)
+    player_detail = read_player_detail(player_name, 'data/player.json')
     return render_template("player.html", player=player_detail) # Return template output if read failed.
+    
+@app.route('/<player_name>/riddles')
+def riddles(player_name):
+    player_detail = read_player_detail(player_name, 'data/player.json')
+    return render_template("riddles.html", player=player_detail)
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
