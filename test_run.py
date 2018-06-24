@@ -45,20 +45,18 @@ class testSuite(unittest.TestCase):
     def test_write_to_player_json(self):
         for x in range(5):
             write_to_player_json('dummy_player', 'data/player.json')
-        with open('data/player.json', 'r') as f:
-            data = json.load(f)
+        data = read_player_json('data/player.json')
         self.assertEqual(len(data), 5)
             
-        #To test if data is read from player.json as expected
+    #To test if data is read from player.json as expected
     def test_read_player_json(self):
         expected_data = [{'player_name': 'dummy_player', 'score': 0}]
         write_to_player_json('dummy_player', 'data/player.json')
-        with open('data/player.json', 'r') as f:
-            data = json.load(f)
+        data = read_player_json('data/player.json')
         self.assertEqual(data, expected_data)
         
-    #To test if player login behaves as expected
-    def test_login(self):
+    #To test if player login form behaves as expected
+    def test_login_form(self):
         tester = app.test_client(self)
         response = tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
         self.assertEqual(response.status_code, 200)
@@ -69,6 +67,17 @@ class testSuite(unittest.TestCase):
         write_to_player_json('dummy_player', 'data/player.json')
         self.assertFalse(is_new_player('dummy_player', 'data/player.json'))
         self.assertTrue(is_new_player('player', 'data/player.json'))
+        
+    """
+    To Test if application refrains from creating duplicates of player record
+    (i.e. multiple records with same player name)
+    """
+    def test_no_duplicates(self):
+        tester = app.test_client(self)
+        for x in range(5):
+            tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
+        data = read_player_json('data/player.json')
+        self.assertEqual(len(data), 1)
     
 if __name__ == '__main__':
     unittest.main()
