@@ -1,8 +1,9 @@
-#login form label {
-    padding-right: 10px;
+img {
+    width: 100%;
 }
 
-#login button {
+#player_name,
+#answer {
     margin: 10px;
 }
 
@@ -11,4 +12,9 @@
     margin-bottom: 10px;
     padding-left: 40px;
     padding-right: 40px;
+}
+
+.riddle-button {
+    margin-left: 5px;
+    margin-right: 5px;
 }
