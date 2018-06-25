@@ -38,6 +38,9 @@
 
 ## Change Log
 
+### 25/06/2018
+- Functionality related to riddles processing has been implemented in full (checks for correct answer and update score), except for simultaneous use case scenario.
+
 ### 24/06/2018
 - Added player options to player.html in form of buttons.
 - Player login now also does uniquesness check so that no duplicates of player name are allowed in player.json
@@ -45,6 +48,7 @@
 
 #### 21:04
 - riddles.html will now display riddle with answer text space below. A new riddle will be chosen randomly on each load.
+- Improved routing on riddles
 
 ### 23/06/2018
 - Partial implementation of player.html
@@ -93,3 +97,18 @@ def test_write_to_player_json(self):
 The reason why the function was called multiple times is to make sure new data is appended to player.json instead of overwritting the whole file. The function will be updated to take two parameters of player_name and file_name instead of hard-coded data.
 
 As the function to identify whether or not a player name entered exists in player.json has been implemented, further tests has been put in place to ensure that the application will not create duplicates of player record in player.json. This serves as the first step of implementing the requirement "Multiple players can play an instance of the game at the same time" where players are identified by a unique player name.
+
+### Logic of processing riddles
+Players are instructed that if they want to pass a riddle, they can do so by submitting a blank answer. This will also in turn saves the effort of implementing code to check "whether a blank answer is the correct answer" or possible bug that may arise by submitting a blank answer. What the application does actually is that when player submits a blank answer, the page reloads and display a new riddle, nothing else. 
+
+As for handling POST request, the code will look something like this:
+```python
+if request.method == "POST":
+        if pass_riddle(request.form["answer"]):
+            return render_template("riddles.html", player=player_detail, riddle=riddle)
+        else:
+            print("checking answer")
+```
+At this stage it might be better to test the result manually rather writting tests since all that is needed it to check if the string "checking answer" printed onto the console when something is entered into the text space.
+
+That said, it would be reasonable to write tests to test the behaviour of the overall logic of processing riddles once the code is in a more complete state.
