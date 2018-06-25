@@ -3,7 +3,8 @@
 <div class="jumbotron text-center">
   <h1 class="display-3">Welcome, {{ player.player_name }}</h1>
   <h2>Your current score is {{ player.score }}</h2>
-  <p class="lead">Your challenges begins, answer as many riddles as you can! Feel free to headback to your player page at anytime.</p>
+  <p class="lead">Your challenges begins, answer as many riddles as you can! If you are struggling, you can pass a riddle by submitting a blank answer.</p>
+  <p class="lead">Feel free to headback to your player page at anytime.</p>
   <a href="{{ url_for('player', player_name=player.player_name) }}"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
 </div>
 
@@ -14,7 +15,7 @@
       <h3 class="text-center">{{ riddle.Q }}</h3>
       {% else %}
       <h3 class="text-center">{{ riddle.Q.Q }}</h3>
-      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle"></img>
+      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle" class="col-md-12 col-lg-4 offset-md-4"></img>
       {% endif %}
     </div>
   </div>
@@ -22,10 +23,19 @@
     <label for="answer">Your answer:</label>
     <input type="text" name="answer" id="answer" />
     <button class="btn btn-success btn-lg riddle-button">Submit Answer</button>
-    <a href="{{ url_for('riddles', player_name=player.player_name) }}">
-      <button class="btn btn-danger btn-lg riddle-button">Pass</button>
-    </a>
   </form>
+  
+  {% if wa|length > 0 %}
+  <div class="row">
+    <div class="col-md-12 text-center">
+      <h4>Here are the wrong answers you have entered so far:</h4>
+      {% for a in wa %}
+      <span>{{ a }} {% if loop.index < wa|length %}, {% endif %}</span>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  <br>
 </div>
 
 {% endblock %}
