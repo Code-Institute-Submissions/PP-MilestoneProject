@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% block content%} 
+
+{% if scores|length == 0 %}
+
+<div class="alert alert-warning text-center">
+  <h4 class="alert-heading">Leaderboard is empty!</h4>
+  <p class="mb-0">Looks like no one has participate in the game yet, let's cheese a bit and takes first place with ease!!</p>
+</div>
+
+{% else %}
+
+<div class="jumbotron text-center">
+  <h1 class="display-3" id="leaderboard-heading">Leaderboard</h1>
+  <p class="lead">Checkout how players are doing in this game of riddles. If you are logged in your scores will be highlighted.</p>
+</div>
+
+<table class="table table-hover text-center">
+  <thead class="table-success">
+     <th scope="col">Player</th>
+      <th scope="col">Score</th>
+  </thead>
+{% for score in scores %}
+  <tbody>
+    {% if loop.index%2 != 0 %}
+    <tr>
+    {% else %}
+    <tr class="table-secondary">
+    {% endif %}
+      <td>{{ score.player_name }}</td>
+      <td>{{ score.score }}</td>
+    </tr>
+  </tbody>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+
+{% endblock %}
