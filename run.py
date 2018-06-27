@@ -2,6 +2,7 @@ import os
 import json
 from flask import Flask, redirect, render_template, request, url_for
 import random
+from operator import itemgetter
 
 app = Flask(__name__)
 
@@ -133,6 +134,11 @@ def answer(player_name, riddleID, answer):
         file_name = "data/" + player_name + "_wa.txt"
         add_wrong_answer(file_name, answer)
         return redirect(url_for('riddle', player_name=player_name, riddleID=riddleID))
+        
+@app.route('/leaderboard')
+def leaderboard():
+    scores = sorted(read_json('data/player.json'), key=itemgetter('score'), reverse=True)
+    return render_template("leaderboard.html", scores=scores)
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
