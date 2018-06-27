@@ -91,21 +91,21 @@ def index():
     if request.method == "POST":
         if is_new_player(request.form['player_name'], 'data/player.json') or zero_player('data/player.json'):
             register_new_player(request.form["player_name"], 'data/player.json')
-        return redirect(request.form["player_name"])
+        return redirect(url_for('player', player_name=request.form["player_name"]))
     return render_template("index.html")
     
-@app.route('/<player_name>')
+@app.route('/player/<player_name>')
 def player(player_name):
     clean_wrong_answers(player_name)
     player_detail = read_player_detail(player_name, 'data/player.json')
     return render_template("player.html", player=player_detail) # Return template output if read failed.
     
-@app.route('/<player_name>/riddles', methods=['GET', 'POST'])
+@app.route('/player/<player_name>/riddles', methods=['GET', 'POST'])
 def riddles(player_name):
     riddleID = get_riddleID('data/riddles.json')
     return redirect(url_for('riddle', player_name=player_name, riddleID=riddleID))
     
-@app.route('/<player_name>/riddles/<riddleID>', methods=['GET', 'POST'])
+@app.route('/player/<player_name>/riddles/<riddleID>', methods=['GET', 'POST'])
 def riddle(player_name, riddleID):
     player_detail = read_player_detail(player_name, 'data/player.json')
     riddle = get_riddle('data/riddles.json', riddleID)
@@ -122,7 +122,7 @@ def riddle(player_name, riddleID):
     else:
         return render_template("riddles.html", player=player_detail, riddle=riddle)
 
-@app.route('/<player_name>/riddles/<riddleID>/<answer>', methods=['GET', 'POST'])
+@app.route('/player/<player_name>/riddles/<riddleID>/<answer>', methods=['GET', 'POST'])
 def answer(player_name, riddleID, answer):
     riddle = get_riddle('data/riddles.json', riddleID)
     if correct_answer(riddle, answer):
