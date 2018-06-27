@@ -25,14 +25,14 @@ class testRoute(unittest.TestCase):
     #To test if page loads correctly (player.html)
     def test_player_loads(self):
         tester = app.test_client(self)
-        response = tester.get('/dummy_player')
+        response = tester.get('player/dummy_player')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player' in response.data)
         
     #To test if page loads correctly (riddles.html)
     def test_riddles_loads(self):
         tester = app.test_client(self)
-        response = tester.get('/dummy_player/riddles', follow_redirects=True)
+        response = tester.get('player/dummy_player/riddles', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player' in response.data)
         self.assertTrue(b'Your challenges begins,' in response.data)
@@ -115,7 +115,7 @@ class testRiddles(unittest.TestCase):
         tester = app.test_client(self)
         tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
         tester.post('/', data=dict(player_name = 'dummy_player2'), follow_redirects = False)
-        tester.get('dummy_player/riddles/Q1/ice')
+        tester.get('player/dummy_player/riddles/Q1/ice')
         data = read_json('data/player.json')
         self.assertEqual(data[0]["score"], 1)
         self.assertEqual(data[1]["score"], 0)
@@ -124,7 +124,7 @@ class testRiddles(unittest.TestCase):
     def test_display_wrong_answers(self):
         tester = app.test_client(self)
         tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
-        response = tester.get('/dummy_player/riddles/Q1/something', follow_redirects=True)
+        response = tester.get('player/dummy_player/riddles/Q1/something', follow_redirects=True)
         self.assertTrue(b"Here are the wrong answers you have entered so far:" in response.data)
         self.assertTrue(b"something" in response.data)
     
