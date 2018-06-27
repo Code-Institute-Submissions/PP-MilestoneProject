@@ -5,6 +5,11 @@ import unittest
 def reset_json(file_name):
     with open(file_name, 'w') as f:
         json.dump([], f)
+        
+#Helper function to write a particular set of data into player.json
+def write_json(file_name, data):
+    with open(file_name, 'w') as f:
+        json.dump(data, f)
 
 class testRoute(unittest.TestCase):
     """
@@ -36,7 +41,13 @@ class testRoute(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player' in response.data)
         self.assertTrue(b'Your challenges begins,' in response.data)
-
+        
+    #To test if page loads correctly (leaderboard.html)
+    def test_leaderboard_loads(self):
+        tester = app.test_client(self)
+        response = tester.get('leaderboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'Leaderboard is empty!' in response.data)
 
 class testPlayerJson(unittest.TestCase):
     """
@@ -127,6 +138,45 @@ class testRiddles(unittest.TestCase):
         response = tester.get('player/dummy_player/riddles/Q1/something', follow_redirects=True)
         self.assertTrue(b"Here are the wrong answers you have entered so far:" in response.data)
         self.assertTrue(b"something" in response.data)
+        
+class testLeaderboard(unittest.TestCase):
+    """
+    Test class related to leaderboard
+    """
+    
+    #To set up player.json before each tests in this class
+    def setUp(self):
+        reset_json('data/player.json')
+        
+    #To remove all data after all tests in this class
+    @classmethod
+    def tearDownClass(cls):
+        reset_json('data/player.json')
+    
+    #To test if player.json is read correctly and displayed in leaderboard.html
+    def test_leaderboard_reads(self):
+        tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
+        response = tester.get('leaderboard')
+        self.assertTrue(b'Checkout how players are doing in this game of riddles.' in response.data)
+        self.assertTrue(b'Player' in response.data)
+        self.assertTrue(b'Score' in response.data)
+        self.assertTrue(b'dummy_player' in response.data)
+        self.assertTrue(b'0' in response.data)
+    
+    #To test if scores are sorted in descending order
+    def test_scores_sorted(self):
+        test_data = [
+            {"score": 0, "player_name": "a"}, 
+            {"score": 5, "player_name": "b"}, 
+            {"score": 3, "player_name": "c"}, 
+            {"score": 2, "player_name": "d"}]
+        write_json('data/player.json', test_data)
+        tester = app.test_client(self)
+        html_out =  str(tester.get('leaderboard').data)
+        self.assertTrue(html_out.index("<td>5</td>") < html_out.index("<td>3</td>"))
+        self.assertTrue(html_out.index("<td>3</td>") < html_out.index("<td>2</td>"))
+        self.assertTrue(html_out.index("<td>2</td>") < html_out.index("<td>0</td>"))
     
 if __name__ == '__main__':
     unittest.main()
