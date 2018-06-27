@@ -38,6 +38,12 @@
 
 ## Change Log
 
+### 27/06/2018
+- leaderboard.html implemented.
+- Further improve routing to accommodate the addition of leaderboard.
+- Added test class related to leaderboard.
+- Updated testRoute test class to reflect new routing.
+
 ### 25/06/2018
 - Functionality related to riddles processing has been implemented in full (checks for correct answer and update score), except for simultaneous use case scenario.
 
