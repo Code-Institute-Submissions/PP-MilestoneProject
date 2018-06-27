@@ -111,4 +111,7 @@ if request.method == "POST":
 ```
 At this stage it might be better to test the result manually rather writting tests since all that is needed it to check if the string "checking answer" printed onto the console when something is entered into the text space.
 
-That said, it would be reasonable to write tests to test the behaviour of the overall logic of processing riddles once the code is in a more complete state.
+That said, it would be reasonable to write tests to test the behaviour of the overall logic of processing riddles once the code is in a more complete state. The elementes that need to be tested are:
+- Identifying whether player has submitted a correct answer or not.
+- Updating scores.
+- Displaying wrong answers as per requirements.
