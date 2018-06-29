@@ -121,3 +121,27 @@ That said, it would be reasonable to write tests to test the behaviour of the ov
 - Identifying whether player has submitted a correct answer or not.
 - Updating scores.
 - Displaying wrong answers as per requirements.
+
+### Sorting out player scores and displaying on leaderboard.html
+First of all, leaderboard.html can be reached via 2 different routes:
+- /leaderboard
+- /player/<player_name>/leaderboard
+
+As far as routing test is concerned, both route needs to be tested independently.
+
+On the other hand, in order to simplify testing for sorting scores and displaying them on leaderboard.html, a preset of data is used as follows:
+```python
+test_data = [
+            {"score": 0, "player_name": "a"}, 
+            {"score": 5, "player_name": "b"}, 
+            {"score": 3, "player_name": "c"}, 
+            {"score": 2, "player_name": "d"}]
+write_json('data/player.json', test_data)
+```
+where write_json is a simple helper function for writing data directly into player.json
+```python
+def write_json(file_name, data):
+    with open(file_name, 'w') as f:
+        json.dump(data, f)
+```
+As for actually testing whether scores are sorted and displayed correctly, we can check where does certain data exist in the html document and see if certain elements exists before some other. This can be achieved by first converting html document into string and use .index() to find out location of certain elements, which will then be used for comparison to check if order is correct.
