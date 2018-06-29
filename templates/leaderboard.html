@@ -21,7 +21,9 @@
   </thead>
 {% for score in scores %}
   <tbody>
-    {% if loop.index%2 != 0 %}
+    {% if score.player_name == player_name %}
+    <tr class="table-success" id="player_score">
+    {% elif loop.index%2 != 0 %}
     <tr>
     {% else %}
     <tr class="table-secondary">

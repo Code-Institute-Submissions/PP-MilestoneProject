@@ -140,7 +140,12 @@ def leaderboard():
     scores = sorted(read_json('data/player.json'), key=itemgetter('score'), reverse=True)
     return render_template("leaderboard.html", scores=scores)
     
+@app.route('/player/<player_name>/leaderboard')
+def player_leaderboard(player_name):
+    scores = sorted(read_json('data/player.json'), key=itemgetter('score'), reverse=True)
+    return render_template("leaderboard.html", scores=scores, player_name=player_name)
+    
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=int(os.environ.get('PORT')),
-            debug=True)
+            debug=True, threaded=True)

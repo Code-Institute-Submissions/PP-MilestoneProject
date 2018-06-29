@@ -48,6 +48,13 @@ class testRoute(unittest.TestCase):
         response = tester.get('leaderboard')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Leaderboard is empty!' in response.data)
+        
+    #To test if leaderboard.html load correctly from another route
+    def test_player_leaderboard_loads(self):
+        tester = app.test_client(self)
+        response = tester.get('player/dummy_player/leaderboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(b'Leaderboard is empty!' in response.data)
 
 class testPlayerJson(unittest.TestCase):
     """
@@ -177,6 +184,21 @@ class testLeaderboard(unittest.TestCase):
         self.assertTrue(html_out.index("<td>5</td>") < html_out.index("<td>3</td>"))
         self.assertTrue(html_out.index("<td>3</td>") < html_out.index("<td>2</td>"))
         self.assertTrue(html_out.index("<td>2</td>") < html_out.index("<td>0</td>"))
+        
+    #To test if score is highlighted when leaderboard is accessed from player page
+    def test_highlight_player_score(self):
+        test_data = [
+            {"score": 0, "player_name": "a"}, 
+            {"score": 5, "player_name": "b"}, 
+            {"score": 3, "player_name": "c"}, 
+            {"score": 2, "player_name": "d"}]
+        write_json('data/player.json', test_data)
+        tester = app.test_client(self)
+        html_out =  str(tester.get('player/a/leaderboard').data)
+        self.assertTrue(html_out.index('id="player_score"') < html_out.index("<td>a</td>"))
+        self.assertTrue(html_out.index('id="player_score"') < html_out.index("<td>0</td>"))
+        self.assertTrue(html_out.index('id="player_score"') > html_out.index("<td>b</td>"))
+        self.assertTrue(html_out.index('id="player_score"') > html_out.index("<td>5</td>"))
     
 if __name__ == '__main__':
     unittest.main()
