@@ -63,25 +63,25 @@ class testPlayerJson(unittest.TestCase):
     
     #To set up player.json before each tests in this class
     def setUp(self):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
             
     #To remove all data from player.json after all tests in this class
     @classmethod
     def tearDownClass(cls):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
     
     #To test if data is written to player.json as expected
     def test_register_new_player(self):
         for x in range(5):
-            register_new_player('dummy_player', 'data/player.json')
-        data = read_json('data/player.json')
+            register_new_player('dummy_player', 'data/players.json')
+        data = read_json('data/players.json')
         self.assertEqual(len(data), 5)
             
     #To test if data is read from player.json as expected
     def test_read_json(self):
         expected_data = [{'player_name': 'dummy_player', 'score': 0}]
-        register_new_player('dummy_player', 'data/player.json')
-        data = read_json('data/player.json')
+        register_new_player('dummy_player', 'data/players.json')
+        data = read_json('data/players.json')
         self.assertEqual(data, expected_data)
         
     #To test if player login form behaves as expected
@@ -93,9 +93,9 @@ class testPlayerJson(unittest.TestCase):
         
     #To test if application can identify both existing and new player
     def test_identify_player(self):
-        register_new_player('dummy_player', 'data/player.json')
-        self.assertFalse(is_new_player('dummy_player', 'data/player.json'))
-        self.assertTrue(is_new_player('player', 'data/player.json'))
+        register_new_player('dummy_player', 'data/players.json')
+        self.assertFalse(is_new_player('dummy_player', 'data/players.json'))
+        self.assertTrue(is_new_player('player', 'data/players.json'))
         
     """
     To Test if application refrains from creating duplicates of player record
@@ -105,7 +105,7 @@ class testPlayerJson(unittest.TestCase):
         tester = app.test_client(self)
         for x in range(5):
             tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
-        data = read_json('data/player.json')
+        data = read_json('data/players.json')
         self.assertEqual(len(data), 1)
 
 class testRiddles(unittest.TestCase):
@@ -115,12 +115,12 @@ class testRiddles(unittest.TestCase):
     
      #To set up player.json before each tests in this class
     def setUp(self):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
             
     #To remove all data after all tests in this class
     @classmethod
     def tearDownClass(cls):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
     
     #To test if application can tell if player submitted a correct answer or not
     def test_answer_riddle(self):
@@ -134,7 +134,7 @@ class testRiddles(unittest.TestCase):
         tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
         tester.post('/', data=dict(player_name = 'dummy_player2'), follow_redirects = False)
         tester.get('player/dummy_player/riddles/Q1/ice')
-        data = read_json('data/player.json')
+        data = read_json('data/players.json')
         self.assertEqual(data[0]["score"], 1)
         self.assertEqual(data[1]["score"], 0)
         
@@ -153,12 +153,12 @@ class testLeaderboard(unittest.TestCase):
     
     #To set up player.json before each tests in this class
     def setUp(self):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
         
     #To remove all data after all tests in this class
     @classmethod
     def tearDownClass(cls):
-        reset_json('data/player.json')
+        reset_json('data/players.json')
     
     #To test if player.json is read correctly and displayed in leaderboard.html
     def test_leaderboard_reads(self):
@@ -178,7 +178,7 @@ class testLeaderboard(unittest.TestCase):
             {"score": 5, "player_name": "b"}, 
             {"score": 3, "player_name": "c"}, 
             {"score": 2, "player_name": "d"}]
-        write_json('data/player.json', test_data)
+        write_json('data/players.json', test_data)
         tester = app.test_client(self)
         html_out =  str(tester.get('leaderboard').data)
         self.assertTrue(html_out.index("<td>5</td>") < html_out.index("<td>3</td>"))
@@ -192,7 +192,7 @@ class testLeaderboard(unittest.TestCase):
             {"score": 5, "player_name": "b"}, 
             {"score": 3, "player_name": "c"}, 
             {"score": 2, "player_name": "d"}]
-        write_json('data/player.json', test_data)
+        write_json('data/players.json', test_data)
         tester = app.test_client(self)
         html_out =  str(tester.get('player/a/leaderboard').data)
         self.assertTrue(html_out.index('id="player_score"') < html_out.index("<td>a</td>"))

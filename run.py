@@ -15,7 +15,7 @@ def read_player_detail(player_name, file_name):
     if zero_player(file_name):
         return {"player_name": player_name, "score": 0}
     else:
-        players = read_json('data/player.json')
+        players = read_json('data/players.json')
         for p in players:
             if p["player_name"] == player_name:
                 return p
@@ -24,7 +24,7 @@ def read_player_detail(player_name, file_name):
 
 def register_new_player(player_name, file_name):
     player = {"player_name": player_name, "score": 0}
-    players = read_json('data/player.json')
+    players = read_json('data/players.json')
     
     players.append(player)
     
@@ -32,11 +32,11 @@ def register_new_player(player_name, file_name):
         json.dump(players, f)
         
 def zero_player(file_name):
-    players = read_json('data/player.json')
+    players = read_json('data/players.json')
     return len(players) == 0
 
 def is_new_player(player_name, file_name):
-    players = read_json('data/player.json')
+    players = read_json('data/players.json')
         
     for p in players:
         if p['player_name'] == player_name:
@@ -90,15 +90,15 @@ def clean_wrong_answers(player_name):
 def index():
     #Handle POST requests
     if request.method == "POST":
-        if is_new_player(request.form['player_name'], 'data/player.json') or zero_player('data/player.json'):
-            register_new_player(request.form["player_name"], 'data/player.json')
+        if is_new_player(request.form['player_name'], 'data/players.json') or zero_player('data/players.json'):
+            register_new_player(request.form["player_name"], 'data/players.json')
         return redirect(url_for('player', player_name=request.form["player_name"]))
     return render_template("index.html")
     
 @app.route('/player/<player_name>')
 def player(player_name):
     clean_wrong_answers(player_name)
-    player_detail = read_player_detail(player_name, 'data/player.json')
+    player_detail = read_player_detail(player_name, 'data/players.json')
     return render_template("player.html", player=player_detail) # Return template output if read failed.
     
 @app.route('/player/<player_name>/riddles', methods=['GET', 'POST'])
@@ -108,7 +108,7 @@ def riddles(player_name):
     
 @app.route('/player/<player_name>/riddles/<riddleID>', methods=['GET', 'POST'])
 def riddle(player_name, riddleID):
-    player_detail = read_player_detail(player_name, 'data/player.json')
+    player_detail = read_player_detail(player_name, 'data/players.json')
     riddle = get_riddle('data/riddles.json', riddleID)
     file_name = "data/" + player_name + "_wa.txt"
     if request.method == "POST":
@@ -127,7 +127,7 @@ def riddle(player_name, riddleID):
 def answer(player_name, riddleID, answer):
     riddle = get_riddle('data/riddles.json', riddleID)
     if correct_answer(riddle, answer):
-        update_score(player_name, 'data/player.json')
+        update_score(player_name, 'data/players.json')
         clean_wrong_answers(player_name)
         return redirect(url_for('riddles', player_name=player_name))
     else:
@@ -137,12 +137,12 @@ def answer(player_name, riddleID, answer):
         
 @app.route('/leaderboard')
 def leaderboard():
-    scores = sorted(read_json('data/player.json'), key=itemgetter('score'), reverse=True)
+    scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
     return render_template("leaderboard.html", scores=scores)
     
 @app.route('/player/<player_name>/leaderboard')
 def player_leaderboard(player_name):
-    scores = sorted(read_json('data/player.json'), key=itemgetter('score'), reverse=True)
+    scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
     return render_template("leaderboard.html", scores=scores, player_name=player_name)
     
 if __name__ == '__main__':
