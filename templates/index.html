@@ -11,6 +11,11 @@
       <input type="text" name="player_name" id="player_name" />
       <button class="btn btn-success btn-lg">Game Start!</button>
     </form>
+    {% if login_failed %}
+    <p class="text-center text-danger">
+      Someone is currently playing the game with the name you just entered, please try again with another name.
+    </p>
+    {% endif %}
 </div>
 
 {% endblock %}
