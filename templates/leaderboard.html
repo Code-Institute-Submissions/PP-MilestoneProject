@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content%} 
+{% extends 'base.html' %} 
+
+{% block content%} 
 
 {% if scores|length == 0 %}
 
@@ -11,7 +13,12 @@
 
 <div class="jumbotron text-center">
   <h1 class="display-3" id="leaderboard-heading">Leaderboard</h1>
-  <p class="lead">Checkout how players are doing in this game of riddles. If you are logged in your scores will be highlighted.</p>
+  <p class="lead">Checkout how players are doing in this game of riddles. Enter a name in the URL to have it highlighted.</p>
+  {% if player_access %}
+  <a href="{{ url_for('player', player_name=player_name) }}">
+    <button type="button" class="btn btn-warning btn-lg">Back to Player Page</button>
+  </a>
+  {% endif %}
 </div>
 
 <table class="table table-hover text-center">
