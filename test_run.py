@@ -5,16 +5,18 @@ import unittest
 def reset_json(file_name):
     with open(file_name, 'w') as f:
         json.dump([], f)
-        
-#Helper function to write a particular set of data into player.json
-def write_json(file_name, data):
-    with open(file_name, 'w') as f:
-        json.dump(data, f)
 
 class testRoute(unittest.TestCase):
     """
     Test class related to routing
     """
+        
+    #To remove all data after all tests in this class
+    @classmethod
+    def tearDownClass(cls):
+        reset_json('data/active_players.json')
+        reset_json('data/players.json')
+    
     #To test if Flask is set up correctly
     def test_index(self):
         tester = app.test_client(self)
@@ -99,27 +101,27 @@ class testJsonManipulation(unittest.TestCase):
         self.assertFalse(is_new_player('dummy_player', 'data/players.json'))
         self.assertTrue(is_new_player('player', 'data/players.json'))
         
-    # """
-    # To Test if application refrains from creating duplicates of player record
-    # (i.e. multiple records with same player name)
-    # """
-    # def test_no_duplicates(self):
-    #     tester = app.test_client(self)
-    #     for x in range(5):
-    #         tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
-    #     data = read_json('data/players.json')
-    #     self.assertEqual(len(data), 1)
+    """
+    To Test if application refrains from creating duplicates of player record
+    (i.e. multiple records with same player name)
+    """
+    def test_no_duplicates(self):
+        tester = app.test_client(self)
+        for x in range(5):
+            tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
+        data = read_json('data/players.json')
+        self.assertEqual(len(data), 1)
 
 class testRiddles(unittest.TestCase):
     """
     Test class related to retrieving, displaying, and processing riddles
     """
     
-     #To set up player.json before each tests in this class
+    #To set up player.json before each tests in this class
     def setUp(self):
         reset_json('data/active_players.json')
         reset_json('data/players.json')
-            
+        
     #To remove all data after all tests in this class
     @classmethod
     def tearDownClass(cls):
@@ -214,6 +216,24 @@ class testMultipleUsers(unittest.TestCase):
     Test class related to multiple concurrent users use case scenario
     """
     
+    #To set up player.json before each tests in this class
+    def setUp(self):
+        reset_json('data/active_players.json')
+        reset_json('data/players.json')
+        
+    #To remove all data after all tests in this class
+    @classmethod
+    def tearDownClass(cls):
+        reset_json('data/active_players.json')
+        reset_json('data/players.json')
+    
+    #To test if application restricts login when player enters a name that is currently active
+    def test_fail_login(self):
+        tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
+        response = tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
+        self.assertTrue(b'Someone is currently playing the game with the name you just entered' in response.data)
+        
     
 if __name__ == '__main__':
     unittest.main()

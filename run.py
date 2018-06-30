@@ -11,6 +11,10 @@ def read_json(file_name):
         data = json.load(f)
     return data
     
+def write_json(file_name, data):
+    with open(file_name, 'w') as f:
+        json.dump(data, f)
+    
 def read_player_detail(player_name, file_name):
     players = read_json('data/players.json')
     if len(players) == 0:
@@ -25,8 +29,7 @@ def register_new_player(player_name, file_name):
     
     players.append(player)
     
-    with open(file_name, 'w') as f:
-        json.dump(players, f)
+    write_json(file_name, players)
         
 # def zero_player(file_name):
 #     players = read_json('data/players.json')
@@ -89,43 +92,57 @@ def clean_wrong_answers(player_name):
 def add_active_player(player_name):
     active_players = read_json('data/active_players.json')
     active_players.append(player_name)
-    
-    with open('data/active_players.json', 'w') as f:
-        json.dump(active_players, f)
+    write_json('data/active_players.json', active_players)
 
 def is_player_active(player_name):
     active_players = read_json('data/active_players.json')
     return player_name in active_players
+    
+def player_logout(player_name):
+    active_players = read_json('data/active_players.json')
+    active_players.remove(player_name)
+    write_json('data/active_players.json', active_players)
+    
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     #Handle POST requests
     if request.method == "POST":
         if is_player_active(request.form["player_name"]):
-            return render_template("index.html", login_failed=True)
+            return render_template("index.html", login_failed=True, player_access=False)
         else:
-            return redirect('/player/' + request.form["player_name"])
-    return render_template("index.html", login_failed=False)
-    
-@app.route('/player/<player_name>')
-def player(player_name):
+            return redirect('/login/' + request.form["player_name"])
+    return render_template("index.html", login_failed=False, player_access=False)
+
+@app.route('/login/<player_name>')
+def login(player_name):
     if is_new_player(player_name, 'data/players.json'):
         register_new_player(player_name, 'data/players.json')
         add_active_player(player_name)
+        return redirect('/player/' + player_name)
     else:
         add_active_player(player_name)
-        
+        return redirect('/player/' + player_name)
+
+@app.route('/player/<player_name>')
+def player(player_name):
+    if not is_player_active(player_name):
+        return redirect('/stray')
     clean_wrong_answers(player_name)
     player_detail = read_player_detail(player_name, 'data/players.json')
-    return render_template("player.html", player=player_detail) # Return template output if read failed.
+    return render_template("player.html", player=player_detail, player_name=player_name, player_access=True)
     
 @app.route('/player/<player_name>/riddles')
 def riddles(player_name):
+    if not is_player_active(player_name):
+        return redirect('/stray')
     riddleID = get_riddleID('data/riddles.json')
     return redirect(url_for('riddle', player_name=player_name, riddleID=riddleID))
     
 @app.route('/player/<player_name>/riddles/<riddleID>', methods=['GET', 'POST'])
 def riddle(player_name, riddleID):
+    if not is_player_active(player_name):
+        return redirect('/stray')
     player_detail = read_player_detail(player_name, 'data/players.json')
     riddle = get_riddle('data/riddles.json', riddleID)
     file_name = "data/" + player_name + "_wa.txt"
@@ -143,6 +160,8 @@ def riddle(player_name, riddleID):
 
 @app.route('/player/<player_name>/riddles/<riddleID>/<answer>', methods=['GET', 'POST'])
 def answer(player_name, riddleID, answer):
+    if not is_player_active(player_name):
+        return redirect('/stray')
     riddle = get_riddle('data/riddles.json', riddleID)
     if correct_answer(riddle, answer):
         update_score(player_name, 'data/players.json')
@@ -162,6 +181,18 @@ def leaderboard():
 def player_leaderboard(player_name):
     scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
     return render_template("leaderboard.html", scores=scores, player_name=player_name, player_access=True)
+    
+@app.route('/player/<player_name>/logout')
+def logout(player_name):
+    active_players = read_json('data/active_players.json')
+    if player_name in active_players:
+        player_logout(player_name)
+    
+    return redirect('/')
+    
+@app.route('/stray')
+def stray():
+    return render_template("stray.html")
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
