@@ -52,22 +52,24 @@ class testRoute(unittest.TestCase):
     #To test if leaderboard.html load correctly from another route
     def test_player_leaderboard_loads(self):
         tester = app.test_client(self)
-        response = tester.get('player/dummy_player/leaderboard')
+        response = tester.get('leaderboard/dummy_player')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Leaderboard is empty!' in response.data)
 
-class testPlayerJson(unittest.TestCase):
+class testJsonManipulation(unittest.TestCase):
     """
-    Test class related to data manipulation with player.json
+    Test class related to data manipulation with .json file
     """
     
     #To set up player.json before each tests in this class
     def setUp(self):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
             
     #To remove all data from player.json after all tests in this class
     @classmethod
     def tearDownClass(cls):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
     
     #To test if data is written to player.json as expected
@@ -97,16 +99,16 @@ class testPlayerJson(unittest.TestCase):
         self.assertFalse(is_new_player('dummy_player', 'data/players.json'))
         self.assertTrue(is_new_player('player', 'data/players.json'))
         
-    """
-    To Test if application refrains from creating duplicates of player record
-    (i.e. multiple records with same player name)
-    """
-    def test_no_duplicates(self):
-        tester = app.test_client(self)
-        for x in range(5):
-            tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
-        data = read_json('data/players.json')
-        self.assertEqual(len(data), 1)
+    # """
+    # To Test if application refrains from creating duplicates of player record
+    # (i.e. multiple records with same player name)
+    # """
+    # def test_no_duplicates(self):
+    #     tester = app.test_client(self)
+    #     for x in range(5):
+    #         tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
+    #     data = read_json('data/players.json')
+    #     self.assertEqual(len(data), 1)
 
 class testRiddles(unittest.TestCase):
     """
@@ -115,11 +117,13 @@ class testRiddles(unittest.TestCase):
     
      #To set up player.json before each tests in this class
     def setUp(self):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
             
     #To remove all data after all tests in this class
     @classmethod
     def tearDownClass(cls):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
     
     #To test if application can tell if player submitted a correct answer or not
@@ -130,18 +134,21 @@ class testRiddles(unittest.TestCase):
     
     #To test if scores are updated correctly
     def test_update_score(self):
+        test_data = [
+            {"score": 0, "player_name": "dummy_player1"}, 
+            {"score": 0, "player_name": "dummy_player2"}]
+        write_json('data/players.json', test_data)
         tester = app.test_client(self)
-        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
-        tester.post('/', data=dict(player_name = 'dummy_player2'), follow_redirects = False)
-        tester.get('player/dummy_player/riddles/Q1/ice')
+        tester.get('player/dummy_player1/riddles/Q1/ice')
         data = read_json('data/players.json')
         self.assertEqual(data[0]["score"], 1)
         self.assertEqual(data[1]["score"], 0)
         
     #To test if wrong answers are displayed properly
     def test_display_wrong_answers(self):
+        test_data = [{"score": 0, "player_name": "dummy_player1"}]
+        write_json('data/players.json', test_data)
         tester = app.test_client(self)
-        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
         response = tester.get('player/dummy_player/riddles/Q1/something', follow_redirects=True)
         self.assertTrue(b"Here are the wrong answers you have entered so far:" in response.data)
         self.assertTrue(b"something" in response.data)
@@ -153,17 +160,19 @@ class testLeaderboard(unittest.TestCase):
     
     #To set up player.json before each tests in this class
     def setUp(self):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
         
     #To remove all data after all tests in this class
     @classmethod
     def tearDownClass(cls):
+        reset_json('data/active_players.json')
         reset_json('data/players.json')
     
     #To test if player.json is read correctly and displayed in leaderboard.html
     def test_leaderboard_reads(self):
         tester = app.test_client(self)
-        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = False)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
         response = tester.get('leaderboard')
         self.assertTrue(b'Checkout how players are doing in this game of riddles.' in response.data)
         self.assertTrue(b'Player' in response.data)
@@ -194,11 +203,17 @@ class testLeaderboard(unittest.TestCase):
             {"score": 2, "player_name": "d"}]
         write_json('data/players.json', test_data)
         tester = app.test_client(self)
-        html_out =  str(tester.get('player/a/leaderboard').data)
+        html_out =  str(tester.get('leaderboard/a').data)
         self.assertTrue(html_out.index('id="player_score"') < html_out.index("<td>a</td>"))
         self.assertTrue(html_out.index('id="player_score"') < html_out.index("<td>0</td>"))
         self.assertTrue(html_out.index('id="player_score"') > html_out.index("<td>b</td>"))
         self.assertTrue(html_out.index('id="player_score"') > html_out.index("<td>5</td>"))
+        
+class testMultipleUsers(unittest.TestCase):
+    """
+    Test class related to multiple concurrent users use case scenario
+    """
+    
     
 if __name__ == '__main__':
     unittest.main()
