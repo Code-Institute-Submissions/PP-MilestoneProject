@@ -12,15 +12,12 @@ def read_json(file_name):
     return data
     
 def read_player_detail(player_name, file_name):
-    if zero_player(file_name):
-        return {"player_name": player_name, "score": 0}
-    else:
-        players = read_json('data/players.json')
-        for p in players:
-            if p["player_name"] == player_name:
-                return p
-        # Return template data if player name is not found in file
-        return {"player_name": player_name, "score": 0}
+    players = read_json('data/players.json')
+    if len(players) == 0:
+        return {"player_name": "temp_player", "score": 0}
+    for p in players:
+        if p["player_name"] == player_name:
+            return p
 
 def register_new_player(player_name, file_name):
     player = {"player_name": player_name, "score": 0}
@@ -31,18 +28,21 @@ def register_new_player(player_name, file_name):
     with open(file_name, 'w') as f:
         json.dump(players, f)
         
-def zero_player(file_name):
-    players = read_json('data/players.json')
-    return len(players) == 0
+# def zero_player(file_name):
+#     players = read_json('data/players.json')
+#     return len(players) == 0
 
 def is_new_player(player_name, file_name):
     players = read_json('data/players.json')
-        
-    for p in players:
-        if p['player_name'] == player_name:
-            return False
-        else:
-            return True
+    
+    if len(players) == 0:
+        return True
+    else:
+        for p in players:
+            if p['player_name'] == player_name:
+                return False
+            else:
+                return True
     
 def get_riddleID(file_name):
     data = read_json('data/riddles.json')
@@ -86,22 +86,40 @@ def clean_wrong_answers(player_name):
     else:
         return
 
+def add_active_player(player_name):
+    active_players = read_json('data/active_players.json')
+    active_players.append(player_name)
+    
+    with open('data/active_players.json', 'w') as f:
+        json.dump(active_players, f)
+
+def is_player_active(player_name):
+    active_players = read_json('data/active_players.json')
+    return player_name in active_players
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     #Handle POST requests
     if request.method == "POST":
-        if is_new_player(request.form['player_name'], 'data/players.json') or zero_player('data/players.json'):
-            register_new_player(request.form["player_name"], 'data/players.json')
-        return redirect(url_for('player', player_name=request.form["player_name"]))
-    return render_template("index.html")
+        if is_player_active(request.form["player_name"]):
+            return render_template("index.html", login_failed=True)
+        else:
+            return redirect('/player/' + request.form["player_name"])
+    return render_template("index.html", login_failed=False)
     
 @app.route('/player/<player_name>')
 def player(player_name):
+    if is_new_player(player_name, 'data/players.json'):
+        register_new_player(player_name, 'data/players.json')
+        add_active_player(player_name)
+    else:
+        add_active_player(player_name)
+        
     clean_wrong_answers(player_name)
     player_detail = read_player_detail(player_name, 'data/players.json')
     return render_template("player.html", player=player_detail) # Return template output if read failed.
     
-@app.route('/player/<player_name>/riddles', methods=['GET', 'POST'])
+@app.route('/player/<player_name>/riddles')
 def riddles(player_name):
     riddleID = get_riddleID('data/riddles.json')
     return redirect(url_for('riddle', player_name=player_name, riddleID=riddleID))
@@ -138,12 +156,12 @@ def answer(player_name, riddleID, answer):
 @app.route('/leaderboard')
 def leaderboard():
     scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
-    return render_template("leaderboard.html", scores=scores)
+    return render_template("leaderboard.html", scores=scores, player_access=False)
     
-@app.route('/player/<player_name>/leaderboard')
+@app.route('/leaderboard/<player_name>')
 def player_leaderboard(player_name):
     scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
-    return render_template("leaderboard.html", scores=scores, player_name=player_name)
+    return render_template("leaderboard.html", scores=scores, player_name=player_name, player_access=True)
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
