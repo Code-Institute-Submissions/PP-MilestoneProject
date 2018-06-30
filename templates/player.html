@@ -13,7 +13,11 @@
         <button type="button" class="btn btn-success btn-lg player-option">Start Playing</button>
       </a>
     </div>
-    <div class="col-md-4"><button type="button" class="btn btn-info btn-lg player-option">Leaderboard</button></div>
+    <div class="col-md-4">
+      <a href="{{ url_for('player_leaderboard', player_name=player.player_name) }}">
+        <button type="button" class="btn btn-info btn-lg player-option">Leaderboard</button>
+      </a>
+    </div>
     <div class="col-md-4">
       <a href="{{ url_for('index') }}">
         <button type="button" class="btn btn-danger btn-lg player-option">Quit Game</button>
