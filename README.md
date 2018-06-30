@@ -38,6 +38,11 @@
 
 ## Change Log
 
+### 30/06/2018
+- Further improve routing so that player can log in directly by entering the correct URL.
+- Added warning message when player enter a name that is currently being used when attempting to log in.
+- Added button to go back to player page when leaderboard is accessed from there.
+
 ### 27/06/2018
 - leaderboard.html implemented.
 - Further improve routing to accommodate the addition of leaderboard.
@@ -138,10 +143,13 @@ test_data = [
             {"score": 2, "player_name": "d"}]
 write_json('data/player.json', test_data)
 ```
-where write_json is a simple helper function for writing data directly into player.json
+where write_json is a function from run.py for writing data directly into player.json
 ```python
 def write_json(file_name, data):
     with open(file_name, 'w') as f:
         json.dump(data, f)
 ```
 As for actually testing whether scores are sorted and displayed correctly, we can check where does certain data exist in the html document and see if certain elements exists before some other. This can be achieved by first converting html document into string and use .index() to find out location of certain elements, which will then be used for comparison to check if order is correct.
+
+### Multiple users use case scenario
+Since it was not mentioned in the requirement that user authentication is required, as long as all current players within the instance are unique to each other (identified by their player name) it would suffice. This can be tested by submitting multiple log in request with the same player name. Once the first request has been processed the application should not allow further log in attempts with the same name until the said name is no longer active.
