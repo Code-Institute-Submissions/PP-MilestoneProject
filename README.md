@@ -38,7 +38,10 @@
 
 ## Change Log
 
-### 30/06/2018
+### 01/07/2018
+- Follow up to [THIS](#30062018), an intermediate route was added to process player login and as a result player can no longer directly go to player page by entering the URL (/player/<player_name>). With this change, a new stray.html template will be used in case player attempts to access the application directly with URL.
+
+### <a name="30062018"></a>30/06/2018
 - Further improve routing so that player can log in directly by entering the correct URL.
 - Added warning message when player enter a name that is currently being used when attempting to log in.
 - Added button to go back to player page when leaderboard is accessed from there.
@@ -153,3 +156,20 @@ As for actually testing whether scores are sorted and displayed correctly, we ca
 
 ### Multiple users use case scenario
 Since it was not mentioned in the requirement that user authentication is required, as long as all current players within the instance are unique to each other (identified by their player name) it would suffice. This can be tested by submitting multiple log in request with the same player name. Once the first request has been processed the application should not allow further log in attempts with the same name until the said name is no longer active.
+
+### Finalizing
+With the implementation of /stray route to handle direct access with URL, some routing tests have to be modified in order to better illustrate how the application is expected to work. For example:
+```python
+def test_player_loads(self):
+    tester = app.test_client(self)
+    response = tester.get('player/dummy_player')
+    self.assertEqual(response.status_code, 200)
+    self.assertTrue(b'Welcome, dummy_player' in response.data)
+```
+This code was used to test if player.html loads however, with the implementation of /stray route this test will return an assertion error was the status code returned is 302 (redirected) rather than 200. The reason for this is because if a user enters /player/player_name without using the form in index.html then the application will redirects to the stray.html, hence the status code 302.
+
+As such, to better illustrate how the application is expected to work, one more line of code is needed in this test:
+```python
+tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
+```
+This concept is applicable in several tests as well; so instead of injecting test data directly into data file, they are posted through a test client as how a normal user would do.
