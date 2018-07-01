@@ -32,6 +32,7 @@ class testRoute(unittest.TestCase):
     #To test if page loads correctly (player.html)
     def test_player_loads(self):
         tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
         response = tester.get('player/dummy_player')
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player' in response.data)
@@ -39,6 +40,7 @@ class testRoute(unittest.TestCase):
     #To test if page loads correctly (riddles.html)
     def test_riddles_loads(self):
         tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
         response = tester.get('player/dummy_player/riddles', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Welcome, dummy_player' in response.data)
@@ -136,11 +138,9 @@ class testRiddles(unittest.TestCase):
     
     #To test if scores are updated correctly
     def test_update_score(self):
-        test_data = [
-            {"score": 0, "player_name": "dummy_player1"}, 
-            {"score": 0, "player_name": "dummy_player2"}]
-        write_json('data/players.json', test_data)
         tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player1'), follow_redirects = True)
+        tester.post('/', data=dict(player_name = 'dummy_player2'), follow_redirects = True)
         tester.get('player/dummy_player1/riddles/Q1/ice')
         data = read_json('data/players.json')
         self.assertEqual(data[0]["score"], 1)
@@ -148,12 +148,12 @@ class testRiddles(unittest.TestCase):
         
     #To test if wrong answers are displayed properly
     def test_display_wrong_answers(self):
-        test_data = [{"score": 0, "player_name": "dummy_player1"}]
-        write_json('data/players.json', test_data)
         tester = app.test_client(self)
+        tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
         response = tester.get('player/dummy_player/riddles/Q1/something', follow_redirects=True)
         self.assertTrue(b"Here are the wrong answers you have entered so far:" in response.data)
         self.assertTrue(b"something" in response.data)
+        clean_wrong_answers("dummy_player")
         
 class testLeaderboard(unittest.TestCase):
     """
