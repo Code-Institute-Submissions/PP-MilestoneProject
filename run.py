@@ -114,6 +114,8 @@ def index():
     if request.method == "POST":
         if is_player_active(request.form["player_name"]):
             return render_template("index.html", login_failed=True, player_access=False)
+        elif len(request.form["player_name"].strip()) == 0:
+            return render_template("index.html", login_failed=False, player_access=False)
         else:
             return redirect('/login/' + request.form["player_name"])
     return render_template("index.html", login_failed=False, player_access=False)
