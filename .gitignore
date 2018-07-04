@@ -1,0 +1,3 @@
+#Ignoring players.json and active_players.json.
+data/players.json
+data/active_players.json
