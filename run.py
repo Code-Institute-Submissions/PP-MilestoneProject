@@ -34,10 +34,6 @@ def register_new_player(player_name, file_name):
     players.append(player)
     
     write_json(file_name, players)
-        
-# def zero_player(file_name):
-#     players = read_json('data/players.json')
-#     return len(players) == 0
 
 def is_new_player(player_name, file_name):
     players = read_json('data/players.json')
@@ -110,10 +106,10 @@ def player_logout(player_name):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not os.path.exists('data/player.json'):
-        create_new_jsonfile('data/player.json')
+    if not os.path.exists('data/players.json'):
+        create_new_jsonfile('data/players.json')
     if not os.path.exists('data/active_players.json'):
-        create_new_jsonfile('data/active_player.json')
+        create_new_jsonfile('data/active_players.json')
     #Handle POST requests
     if request.method == "POST":
         if is_player_active(request.form["player_name"]):

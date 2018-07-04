@@ -75,6 +75,15 @@ class testJsonManipulation(unittest.TestCase):
     def tearDownClass(cls):
         reset_json('data/active_players.json')
         reset_json('data/players.json')
+        
+    #To test if application can create new data file when it is being used for the first time.
+    def test_create_new_datafile(self):
+        os.remove('data/players.json')
+        os.remove('data/active_players.json')
+        tester = app.test_client(self)
+        tester.get('/')
+        self.assertTrue(os.path.exists('data/players.json'))
+        self.assertTrue(os.path.exists('data/active_players.json'))
     
     #To test if data is written to player.json as expected
     def test_register_new_player(self):
