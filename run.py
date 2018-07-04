@@ -14,6 +14,10 @@ def read_json(file_name):
 def write_json(file_name, data):
     with open(file_name, 'w') as f:
         json.dump(data, f)
+        
+def create_new_jsonfile(file_name):
+    with open(file_name, 'w') as f:
+        json.dump([], f)
     
 def read_player_detail(player_name, file_name):
     players = read_json('data/players.json')
@@ -106,6 +110,10 @@ def player_logout(player_name):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if not os.path.exists('data/player.json'):
+        create_new_jsonfile('data/player.json')
+    if not os.path.exists('data/active_players.json'):
+        create_new_jsonfile('data/active_player.json')
     #Handle POST requests
     if request.method == "POST":
         if is_player_active(request.form["player_name"]):

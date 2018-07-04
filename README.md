@@ -42,6 +42,7 @@
 - Deployed on Heroku.
 - Added requirements.txt and Procfile needed for deployment on Heroku.
 - Added .gitignore file.
+- Added fallback solution when application is used for the very first time where players.json and active_players.json do not exist yet.
 
 ### 01/07/2018
 - Follow up to [THIS](#30062018), an intermediate route was added to process player login and as a result player can no longer directly go to player page by entering the URL (/player/<player_name>). With this change, a new stray.html template will be used in case player attempts to access the application directly with URL.
