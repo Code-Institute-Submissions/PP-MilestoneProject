@@ -15,13 +15,13 @@
       <h3 class="text-center">{{ riddle.Q }}</h3>
       {% else %}
       <h3 class="text-center">{{ riddle.Q.Q }}</h3>
-      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle" class="col-md-12"></img>
+      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle" class="col-12 col-sm-4 offset-sm-4"></img>
       {% endif %}
     </div>
   </div>
   <form class="form-inline form-control-lg justify-content-center" method="POST">
     <label for="answer">Your answer:</label>
-    <input type="text" name="answer" id="answer" />
+    <input type="text" name="answer" id="answer" maxlength="20"/>
     <button class="btn btn-success btn-lg riddle-button">Submit Answer</button>
   </form>
   

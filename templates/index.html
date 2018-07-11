@@ -2,18 +2,20 @@
 
 <div class="jumbotron text-center">
   <h1 class="display-3">Riddle Me These</h1>
-  <p class="lead">This is a simple riddle game. You will be faced by riddles after riddles; do you have what it takes to achieve top scores? Get started by entering your player name below!</p>
+  <p class="lead">This is a simple riddle game. You will be faced by riddles after riddles; do you have what it takes to achieve top scores? Get started by logging in below!</p>
 </div>
 
 <div class="container-fluid" id="login">
     <form class="form-inline form-control-lg justify-content-center" method="POST">
       <label for="player_name">Player name:</label>
-      <input type="text" name="player_name" id="player_name" />
+      <input type="text" name="player_name" id="player_name" maxlength="20"/>
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" maxlength="20"/>
       <button class="btn btn-success btn-lg">Game Start!</button>
     </form>
     {% if login_failed %}
     <p class="text-center text-danger">
-      Someone is currently playing the game with the name you just entered, please try again with another name.
+      Login failed. Please make sure you have entered the details correctly.
     </p>
     {% endif %}
 </div>
