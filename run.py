@@ -1,34 +1,34 @@
 import os
 import json
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, session, g
 import random
 from operator import itemgetter
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 def read_json(file_name):
-    with open(file_name, 'r') as f:
-        data = json.load(f)
-    return data
+    try:
+        with open(file_name, 'r') as f:
+            data = json.load(f)
+        return data
+    except:
+        return []
     
 def write_json(file_name, data):
-    with open(file_name, 'w') as f:
+    with open(file_name, 'w+') as f:
         json.dump(data, f)
-        
-def create_new_jsonfile(file_name):
-    with open(file_name, 'w') as f:
-        json.dump([], f)
     
-def read_player_detail(player_name, file_name):
+def get_player_detail(player_name, file_name):
     players = read_json('data/players.json')
     if len(players) == 0:
-        return {"player_name": "temp_player", "score": 0}
+        return None
     for p in players:
         if p["player_name"] == player_name:
             return p
 
-def register_new_player(player_name, file_name):
-    player = {"player_name": player_name, "score": 0}
+def add_new_player(player_name, password, file_name):
+    player = {"player_name": player_name, "top_score": 0, "current_score": 0, "password": password}
     players = read_json('data/players.json')
     
     players.append(player)
@@ -103,40 +103,39 @@ def player_logout(player_name):
     active_players.remove(player_name)
     write_json('data/active_players.json', active_players)
     
+# Using code from https://www.youtube.com/watch?v=eBwhBrNbrNI
+@app.before_request
+def before_request():
+    g.user = None
+    if 'user' in session:
+        g.user = session['user']
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    if not os.path.exists('data/players.json'):
-        create_new_jsonfile('data/players.json')
-    if not os.path.exists('data/active_players.json'):
-        create_new_jsonfile('data/active_players.json')
+        
     #Handle POST requests
     if request.method == "POST":
-        if is_player_active(request.form["player_name"]):
-            return render_template("index.html", login_failed=True, player_access=False)
-        elif len(request.form["player_name"].strip()) == 0:
-            return render_template("index.html", login_failed=False, player_access=False)
+        if is_new_player(request.form['player_name'], 'data/players.json'):
+            add_new_player(request.form['player_name'], request.form['password'], 'data/players.json')
+            return "Hi, new player"
         else:
-            return redirect('/login/' + request.form["player_name"])
+            player = get_player_detail(request.form['player_name'], 'data/players.json')
+            if player['password'] == request.form['password']:
+                session['player'] = request.form['player_name']
+                return redirect(url_for('player', player_name=request.form['player_name']))
+            else:
+                return render_template("index.html", login_failed=True, player_access=False)
+            
     return render_template("index.html", login_failed=False, player_access=False)
-
-@app.route('/login/<player_name>')
-def login(player_name):
-    if is_new_player(player_name, 'data/players.json'):
-        register_new_player(player_name, 'data/players.json')
-        add_active_player(player_name)
-        return redirect('/player/' + player_name)
-    else:
-        add_active_player(player_name)
-        return redirect('/player/' + player_name)
 
 @app.route('/player/<player_name>')
 def player(player_name):
-    if not is_player_active(player_name):
-        return redirect('/stray')
-    clean_wrong_answers(player_name)
-    player_detail = read_player_detail(player_name, 'data/players.json')
-    return render_template("player.html", player=player_detail, player_name=player_name, player_access=True)
+    if 'player' in session:
+        clean_wrong_answers(player_name)
+        player_detail = get_player_detail(player_name, 'data/players.json')
+        return render_template("player.html", player=player_detail, player_name=player_name, player_access=True)
+    return render_template("stray.html")
     
 @app.route('/player/<player_name>/riddles')
 def riddles(player_name):
@@ -149,7 +148,7 @@ def riddles(player_name):
 def riddle(player_name, riddleID):
     if not is_player_active(player_name):
         return redirect('/stray')
-    player_detail = read_player_detail(player_name, 'data/players.json')
+    player_detail = get_player_detail(player_name, 'data/players.json')
     riddle = get_riddle('data/riddles.json', riddleID)
     file_name = "data/" + player_name + "_wa.txt"
     if request.method == "POST":
@@ -190,10 +189,7 @@ def player_leaderboard(player_name):
     
 @app.route('/player/<player_name>/logout')
 def logout(player_name):
-    active_players = read_json('data/active_players.json')
-    if player_name in active_players:
-        player_logout(player_name)
-    
+    session.pop('player', None)
     return redirect('/')
     
 @app.route('/stray')
@@ -203,4 +199,4 @@ def stray():
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=int(os.environ.get('PORT')),
-            debug=False, threaded=True)
+            debug=True, threaded=True)
