@@ -38,6 +38,16 @@
 
 ## Change Log
 
+### 11/07/2018
+After review the application will undergon some hugh changes, they are as follow:
+- Player login will require password.
+- Form validation such as field length limitation for better user friendliness.
+- The application will loop through the whole riddle base (in random order) instead of picking one at random. This will prevent questions from repeating too often.
+- Along with the change above, instead of a accumulative score, there will be a top score and a current score for each player. That means each session will be treated individually.
+- Implementation of hints to help players who are struggling.
+- Further styling on pictorial riddles so they are easier to look at on larger screens.
+Anything not mentioned in this list will remain mostly the same.
+
 ### 04/07/2018
 - Deployed on Heroku.
 - Added requirements.txt and Procfile needed for deployment on Heroku.
