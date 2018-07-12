@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, redirect, render_template, request, url_for, session
+from flask import Flask, redirect, render_template, request, url_for, session, flash
 import random
 from operator import itemgetter
 
@@ -26,7 +26,7 @@ def get_player_detail(player_name, file_name):
     return False
 
 def add_new_player(player_name, password, file_name):
-    player = {"player_name": player_name, "top_score": 0, "current_score": 0, "password": password, "logged_in": False}
+    player = {"player_name": player_name, "top_score": 0, "password": password, "logged_in": False}
     players = read_json('data/players.json')
     players.append(player)
     write_json(file_name, players)
@@ -38,17 +38,13 @@ def change_online_status(player_name, file_name, status):
     for d in data:
         if d["player_name"] == player_name:
             d["logged_in"] = status
-            with open(file_name, 'w') as f:
-                json.dump(data, f)
-            return
+            write_json('data/players.json', data)
         
 def all_log_off(file_name):
     data = read_json(file_name)
     for d in data:
         d["logged_in"] = False
-        with open(file_name, 'w') as f:
-            json.dump(data, f)
-        return
+        write_json('data/players.json', data)
     
 def get_riddleID(file_name):
     data = read_json('data/riddles.json')
@@ -66,14 +62,12 @@ def pass_riddle(answer):
 def correct_answer(riddle, answer):
     return answer.capitalize() in riddle["A"]
     
-def update_score(player_name, file_name):
+def update_score(player_name, score, file_name):
     data = read_json(file_name)
     for d in data:
         if d["player_name"] == player_name:
-            d["score"] += 1
-            with open(file_name, 'w') as f:
-                json.dump(data, f)
-            return
+            d["top_score"] = score
+            write_json('data/players.json', data)
 
 def add_wrong_answer(file_name, answer):
     with open(file_name, 'a') as f:
@@ -92,6 +86,7 @@ def clean_wrong_answers(player_name):
     else:
         return
 
+# Clear sessions and reset player file when application starts for the first time.
 @app.before_first_request
 def startup():
     try:
@@ -132,27 +127,50 @@ def index():
 def player(player_name):
     if 'player' in session:
         player = session['player']
-        session['qs'] = [x+1 for x in range(len(read_json('data/riddles.json')))]
+        session['qs'] = [x for x in range(len(read_json('data/riddles.json')))]
         session['wrong_answers'] = []
-        return render_template("player.html", player=player, player_name=player_name, player_access=True)
+        session['current_score'] = 0
+        return render_template("player.html", player=player)
+        
     return render_template("stray.html")
     
 @app.route('/player/<player_name>/riddles')
 def riddles(player_name):
     if 'player' in session:
-        session['q'] = random.choice(session['qs'])
-        return redirect(url_for('riddle', player_name=player_name, riddleID=session['q']))
+        if len(session['qs']) > 0:
+            session['q'] = random.choice(session['qs'])
+            return redirect(url_for('riddle', player_name=player_name, riddleID=session['q']))
+        else:
+            # Current score from a recently finished game session will be recorded as top scores
+            # if and only the current score is higher than top score recorded in file.
+            if int(session['current_score']) > int(session['player']['top_score']):
+                update_score(str(session['player']['player_name']), int(session['current_score']), 'data/players.json')
+            
+            flash("Here is the result of your last session:")
+            flash("Score: " + str(session['current_score']))
+            flash("Good job!")
+            return redirect(url_for('player', player_name=player_name))
         
     return render_template("stray.html")
     
 @app.route('/player/<player_name>/riddles/<riddleID>', methods=['GET', 'POST'])
 def riddle(player_name, riddleID):
     if 'player' in session:
+        # Pick another question if player attempts to use URL to go back to
+        #a question already attempted.
+        if not(int(riddleID) in session['qs']):
+            return redirect(url_for('riddles', player_name=player_name))
+        
+        # Reassign session['q'] if player access directly with URL
+        session['q'] = int(riddleID)
+        
         player = session['player']
         riddle = get_riddle('data/riddles.json', riddleID)
         if request.method == "POST":
             if pass_riddle(request.form["answer"]):
                 session['wrong_answers'] = []
+                session['qs'].remove(int(session['q']))
+                print(str(session['qs']))
                 return redirect(url_for('riddles', player_name=player_name))
             else:
                 return redirect(url_for('answer', player_name=player_name, riddleID=riddleID, answer=request.form["answer"]))
@@ -160,6 +178,7 @@ def riddle(player_name, riddleID):
             return render_template("riddles.html", player=player, riddle=riddle)
         else:
             return render_template("riddles.html", player=player, riddle=riddle, wa=session['wrong_answers'])
+            
     return render_template("stray.html")
 
 @app.route('/player/<player_name>/riddles/<riddleID>/<answer>', methods=['GET', 'POST'])
@@ -167,7 +186,7 @@ def answer(player_name, riddleID, answer):
     if 'player' in session:
         riddle = get_riddle('data/riddles.json', riddleID)
         if correct_answer(riddle, answer):
-            session['player']['current_score'] += 1
+            session['current_score'] += 1
             session['wrong_answers'] = []
             session['qs'].remove(int(session['q']))
             print(str(session['qs']))
@@ -176,18 +195,18 @@ def answer(player_name, riddleID, answer):
             wrong_answers = session['wrong_answers']
             wrong_answers.append(answer.capitalize())
             session['wrong_answers'] = wrong_answers
-            print(str(session['wrong_answers']))
             return redirect(url_for('riddle', player_name=player_name, riddleID=riddleID))
+            
     return render_template("stray.html")
         
 @app.route('/leaderboard')
 def leaderboard():
-    scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
-    return render_template("leaderboard.html", scores=scores, player_access=False)
+    scores = sorted(read_json('data/players.json'), key=itemgetter('top_score'), reverse=True)
+    return render_template("leaderboard.html", scores=scores)
     
 @app.route('/leaderboard/<player_name>')
 def player_leaderboard(player_name):
-    scores = sorted(read_json('data/players.json'), key=itemgetter('score'), reverse=True)
+    scores = sorted(read_json('data/players.json'), key=itemgetter('top_score'), reverse=True)
     return render_template("leaderboard.html", scores=scores, player_name=player_name, player_access=True)
     
 @app.route('/player/<player_name>/logout')
