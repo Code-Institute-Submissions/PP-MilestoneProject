@@ -18,6 +18,11 @@
       Login failed. Please make sure you have entered the details correctly.
     </p>
     {% endif %}
+    {% if logged_in %}
+    <p class="text-center text-danger">
+      This player is currently logged in on another machine. Please try again later.
+    </p>
+    {% endif %}
 </div>
 
 {% endblock %}
