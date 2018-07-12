@@ -1,67 +1,67 @@
 [{
-    "ID": "Q1",
+    "ID": "0",
     "type": "text",
     "Q": "I’M THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?",
-    "A": "Ice"
+    "A": ["Ice"]
   },
   {
-    "ID": "Q2",
+    "ID": "1",
     "type": "text",
     "Q": "WHAT BELONGS TO YOU BUT OTHERS USE IT MORE THAN YOU DO?",
-    "A": "Name"
+    "A": ["Name"]
   },
   {
-    "ID": "Q3",
+    "ID": "2",
     "type": "text",
     "Q": "DAVID’S FATHER HAS THREE SONS: SNAP, CRACKLE AND ?",
-    "A": "David"
+    "A": ["David"]
   },
   {
-    "ID": "Q4",
+    "ID": "3",
     "type": "text",
     "Q": "WHAT SITS IN A CORNER WHILE TRAVELING ALL AROUND THE WORLD?",
-    "A": "Stamp"
+    "A": ["Stamp"]
   },
   {
-    "ID": "Q5",
+    "ID": "4",
     "type": "image",
     "Q": {
       "Q": "HOW MANY TRIANGLES ARE THERE IN THE IMAGE?",
       "I": "/static/image/triangles-1.jpg"
     },
-    "A": "40"
+    "A": ["40"]
   },
   {
-    "ID": "Q6",
+    "ID": "5",
     "type": "image",
     "Q": {
       "Q": "WHAT IS THE MISSING NUMBER IN THE IMAGE?",
       "I": "/static/image/missing-number-1.jpg"
     },
-    "A": "6"
+    "A": ["6"]
   },
   {
-    "ID": "Q7",
+    "ID": "6",
     "type": "text",
     "Q": "WHAT DO YOU GET WHEN YOU CROSS AN AUTOMOBILE WITH A HOUSEHOLD ANIMAL?",
-    "A": "Carpet"
+    "A": ["Carpet"]
   },
   {
-    "ID": "Q8",
+    "ID": "7",
     "type": "text",
     "Q": "WHAT FIVE-LETTER WORD BECOMES SHORTER WHEN YOU ADD TWO LETTERS TO IT?",
-    "A": "Short"
+    "A": ["Short"]
   },
   {
-    "ID": "Q9",
+    "ID": "8",
     "type": "text",
     "Q": "LIVES WITHOUT A BODY, HEARS WITHOUT EARS, SPEAKS WITHOUT A MOUTH, TO WHICH THE AIR ALONE GIVES BIRTH. WHAT IS IT?",
-    "A": "Echo"
+    "A": ["Echo"]
   },
   {
-    "ID": "Q10",
+    "ID": "9",
     "type": "text",
     "Q": "WHAT HAS NO BEGINNING, END, OR MIDDLE?",
-    "A": "Doughnut"
+    "A": ["Doughnut", "Donut"]
   }
 ]
