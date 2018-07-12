@@ -1,7 +1,9 @@
 #player_name,
 #password,
-#answer {
-    margin: 10px;
+#answer, 
+#login {
+    margin-right: 5px;
+    margin-bottom: 5px;
 }
 
 .player-option {
@@ -23,6 +25,16 @@
 .stray-image {
     width: 100%;
     height: auto;
+}
+
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -10;
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 767px) {

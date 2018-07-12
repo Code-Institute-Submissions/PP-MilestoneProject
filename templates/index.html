@@ -6,23 +6,22 @@
 </div>
 
 <div class="container-fluid" id="login">
-    <form class="form-inline form-control-lg justify-content-center" method="POST">
-      <label for="player_name">Player name:</label>
-      <input type="text" name="player_name" id="player_name" maxlength="20"/>
-      <label for="password">Password:</label>
-      <input type="password" name="password" id="password" maxlength="20"/>
-      <button class="btn btn-success btn-lg">Game Start!</button>
-    </form>
-    {% if login_failed %}
-    <p class="text-center text-danger">
-      Login failed. Please make sure you have entered the details correctly.
-    </p>
-    {% endif %}
-    {% if logged_in %}
-    <p class="text-center text-danger">
-      This player is currently logged in on another machine. Please try again later.
-    </p>
-    {% endif %}
+
+  <form class="form-inline form-control-lg justify-content-center" method="POST">
+      <input type="text" name="player_name" id="player_name" maxlength="20" placeholder="Player Name" class="col-12 col-md" />
+      <input type="password" name="password" id="password" maxlength="20" placeholder="Password" class="col-12 col-md" />
+      <button class="btn btn-success btn-lg col-12 col-md" id="login">Game Start!</button>
+  </form>
+  {% if login_failed %}
+  <p class="text-center text-danger">
+    Login failed. Please make sure you have entered the details correctly.
+  </p>
+  {% endif %} {% if logged_in %}
+  <p class="text-center text-danger">
+    This player is currently logged in on another machine. Please try again later.
+  </p>
+  {% endif %}
+
 </div>
 
 {% endblock %}

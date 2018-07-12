@@ -2,7 +2,7 @@
 
 <div class="jumbotron text-center">
   <h1 class="display-3">Welcome, {{ player.player_name }}</h1>
-  <h2>Your current score is {{ player.score }}</h2>
+  <h2>Your personal best is {{ player.top_score }}</h2>
   <p class="lead">Start gaming right away or check how your rivals are doing!</p>
 </div>
 
@@ -19,11 +19,33 @@
       </a>
     </div>
     <div class="col-md-4">
-      <a href="{{ url_for('logout', player_name=player_name) }}">
+      <a href="{{ url_for('logout', player_name=player.player_name) }}">
         <button type="button" class="btn btn-danger btn-lg player-option">Quit Game</button>
       </a>
     </div>
   </div>
 </div>
+
+    <div class="modal fade" id="sessionResult">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title text-center">Session Result</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true" id="close1">&times;</span>
+                </button>
+          </div>
+          <div class="modal-body text-center">
+            Testing
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close2">Close Window</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-backdrop"></div>
+    </div>
+    
+    
 
 {% endblock %}
