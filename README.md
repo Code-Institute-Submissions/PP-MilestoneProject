@@ -38,6 +38,17 @@
 
 ## Change Log
 
+### 14/07/2018
+- New player login implemented.
+    - Player login will now require password on top of player name.
+    - Basic form validation are handled in frontend.
+    - Flask session has been used for handling players login.
+- New game logic implemented.
+    - Each game will now be finite instead of running on forever until players decide to quit. A single game will go through all questions in the riddle base and no question will be repeated within the same game.
+    - Players can attempt to go through the whole game or drop out at anytime at which, scores will be calculated.
+    - Current scores is only relevant when player is playing, hence it will not be stored in data file. Top score otherwise, will update when players make a new record for themselves.
+- Added 'rank' column to leaderboard for better readability.
+
 ### 11/07/2018
 After review the application will undergo some hugh changes, they are as follow:
 - Player login will require password.
