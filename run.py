@@ -132,7 +132,7 @@ def player(player_name):
     
     if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         player = get_player_detail(player_name, 'data/players.json')
-        session['qs'] = [x for x in range(len(read_json('data/riddles.json')))]
+        session['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
         session['wrong_answers'] = []
         session['current_score'] = 0
         return render_template("player.html", player=player)
@@ -159,11 +159,13 @@ def riddle(player_name, riddleID):
     if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         # Pick another question if player attempts to use URL to go back to
         #a question already attempted.
-        if not(int(riddleID) in session['qs']):
+        if str(riddleID) not in session['qs']:
             return redirect(url_for('riddles', player_name=player_name))
         
         # Reassign session['q'] if player access directly with URL
-        session['q'] = int(riddleID)
+        if str(riddleID) != session['q']:
+            session['wrong_answers'] = []
+            session['q'] = int(riddleID)
         
         riddle = get_riddle('data/riddles.json', riddleID)
         if request.method == "POST":
