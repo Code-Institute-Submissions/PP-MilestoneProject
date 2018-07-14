@@ -13,9 +13,9 @@
 
 <div class="jumbotron text-center">
   <h1 class="display-3" id="leaderboard-heading">Leaderboard</h1>
-  <p class="lead">Checkout how players are doing in this game of riddles. Enter a name in the URL to have it highlighted.</p>
-  {% if player_access %}
-  <a href="{{ url_for('player', player_name=player_name) }}">
+  <p class="lead">Checkout how players are doing in this game of riddles. </p>
+  {% if 'player' in session %}
+  <a href="{{ url_for('player', player_name=session['player']) }}">
     <button type="button" class="btn btn-warning btn-lg">Back to Player Page</button>
   </a>
   {% endif %}
@@ -23,20 +23,22 @@
 
 <table class="table table-hover text-center">
   <thead class="table-success">
+    <th scope="col">Rank</th>
      <th scope="col">Player</th>
-      <th scope="col">Score</th>
+      <th scope="col">Top Score</th>
   </thead>
 {% for score in scores %}
   <tbody>
-    {% if score.player_name == player_name %}
+    {% if score.player_name == session['player'] %}
     <tr class="table-success" id="player_score">
     {% elif loop.index%2 != 0 %}
     <tr>
     {% else %}
     <tr class="table-secondary">
     {% endif %}
+      <td>{{ loop.index }}</td>
       <td>{{ score.player_name }}</td>
-      <td>{{ score.score }}</td>
+      <td>{{ score.top_score }}</td>
     </tr>
   </tbody>
 
