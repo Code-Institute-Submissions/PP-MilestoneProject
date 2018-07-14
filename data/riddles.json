@@ -2,25 +2,29 @@
     "ID": "0",
     "type": "text",
     "Q": "I’M THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?",
-    "A": ["Ice"]
+    "A": ["Ice"],
+    "H": "What is made from water and disappears in water?"
   },
   {
     "ID": "1",
     "type": "text",
     "Q": "WHAT BELONGS TO YOU BUT OTHERS USE IT MORE THAN YOU DO?",
-    "A": ["Name"]
+    "A": ["Name"],
+    "H": "How do others refer to you?"
   },
   {
     "ID": "2",
     "type": "text",
     "Q": "DAVID’S FATHER HAS THREE SONS: SNAP, CRACKLE AND ?",
-    "A": ["David"]
+    "A": ["David"],
+    "H": "'David's' father has three sons."
   },
   {
     "ID": "3",
     "type": "text",
     "Q": "WHAT SITS IN A CORNER WHILE TRAVELING ALL AROUND THE WORLD?",
-    "A": ["Stamp"]
+    "A": ["Stamp"],
+    "H": "Corner of an envelope."
   },
   {
     "ID": "4",
@@ -29,7 +33,8 @@
       "Q": "HOW MANY TRIANGLES ARE THERE IN THE IMAGE?",
       "I": "/static/image/triangles-1.jpg"
     },
-    "A": ["40"]
+    "A": ["40"],
+    "H": "There are 8 triangles in each of the smaller squares. Start workking out from there."
   },
   {
     "ID": "5",
@@ -38,30 +43,35 @@
       "Q": "WHAT IS THE MISSING NUMBER IN THE IMAGE?",
       "I": "/static/image/missing-number-1.jpg"
     },
-    "A": ["6"]
+    "A": ["6"],
+    "H": "Look at the diagonals."
   },
   {
     "ID": "6",
     "type": "text",
     "Q": "WHAT DO YOU GET WHEN YOU CROSS AN AUTOMOBILE WITH A HOUSEHOLD ANIMAL?",
-    "A": ["Carpet"]
+    "A": ["Carpet"],
+    "H": "Automobile + household animal = c _ _ p _ _"
   },
   {
     "ID": "7",
     "type": "text",
     "Q": "WHAT FIVE-LETTER WORD BECOMES SHORTER WHEN YOU ADD TWO LETTERS TO IT?",
-    "A": ["Short"]
+    "A": ["Short"],
+    "H": "_ _ _ _ _ + er = shorter"
   },
   {
     "ID": "8",
     "type": "text",
     "Q": "LIVES WITHOUT A BODY, HEARS WITHOUT EARS, SPEAKS WITHOUT A MOUTH, TO WHICH THE AIR ALONE GIVES BIRTH. WHAT IS IT?",
-    "A": ["Echo"]
+    "A": ["Echo"],
+    "H": "e _ _ _"
   },
   {
     "ID": "9",
     "type": "text",
     "Q": "WHAT HAS NO BEGINNING, END, OR MIDDLE?",
-    "A": ["Doughnut", "Donut"]
+    "A": ["Doughnut", "Donut"],
+    "H": "A shape"
   }
 ]

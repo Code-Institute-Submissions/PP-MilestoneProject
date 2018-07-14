@@ -1,10 +1,8 @@
 {% extends 'base.html' %} {% block content%}
 
-<div class="container">
-  <button type="button" class="btn btn-secondary d-xs-block d-sm-none col" data-toggle="modal" data-target="#top-panel">
-  Current Score: {{ session['current_score'] }} Tap for more info
+<button type="button" class="alert alert-light d-xs-block d-sm-none col" data-toggle="modal" data-target="#top-panel">
+  {{ session['player']}}, your current score is {{ session['current_score'] }}. Tap for more info
 </button>
-</div>
 
 <div class="modal fade" id="top-panel">
   <div class="modal-dialog" role="document">
@@ -35,32 +33,48 @@
   <h2>Your current score is {{ session['current_score'] }}</h2>
   <p class="lead">Your challenges begins, answer as many riddles as you can! If you are struggling, you can pass a riddle by submitting a blank answer.</p>
   <p class="lead">Feel free to headback to your player page at anytime.</p>
-  <a href="url_for('game_finish', player_name=session['player'])"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
+  <a href="{{ url_for('game_finish', player_name=session['player']) }}"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
 </div>
 
 <div class="container">
+  {% if riddle.type=='text' %}
   <div class="row">
-    <div class="col-md-12">
-      {% if riddle.type=='text' %}
-      <h3 class="text-center">{{ riddle.Q }}</h3>
-      {% else %}
-      <h3 class="text-center">{{ riddle.Q.Q }}</h3>
-      <img src="{{ riddle.Q.I }}" alt="A pictorial riddle" class="col-12 col-sm-4 offset-sm-4"></img>
-      {% endif %}
+    <h3 class="text-center">{{ riddle.Q }}</h3>
+    <button type="button" class="btn btn-info btn-lg col-10 offset-1 col-md-4 offset-md-4" id="hint_button" data-toggle="collapse" data-target="#hint" data-text-swap="Hide Hint">Hint</button>
+    <div class="col-12 text-center collapse" id="hint">
+      <h3>Hint</h3>
+      {{ riddle.H }}
     </div>
   </div>
+  {% else %}
+  <div class="row">
+    <h3 class="text-center col-12">{{ riddle.Q.Q }}</h3>
+    <img src="{{ riddle.Q.I }}" alt="A pictorial riddle" class="col-12 col-sm-4 offset-sm-2"></img>
+    <div class="panel-group col-12 col-sm-4">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <a data-toggle="collapse" href="#collapse1"><button type="button" class="btn btn-info btn-lg col" id="hint_button" data-toggle="collapse" data-target="#hint" data-text-swap="Hide Hint">Hint</button></a>
+        </div>
+        <div id="collapse1" class="panel-collapse collapse text-center">
+          <h3>Hint</h3>
+          {{ riddle.H }}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <form class="form-inline form-control-lg justify-content-center" method="POST">
-    <input type="text" name="answer" id="answer" maxlength="20" class="col col-md" placeholder="Your Answer">
-    <button class="btn btn-success btn-lg riddle-button col-md">Submit Answer</button>
+    <input type="text" name="answer" id="answer" maxlength="20" class="col-12 col-md-6" placeholder="Your Answer">
+    <button class="btn btn-success btn-lg col-12 col-md-3">Submit Answer</button>
   </form>
-  
+
   {% if wa|length > 0 %}
   <div class="row">
     <div class="col-md-12 text-center">
       <h4>Here are the wrong answers you have entered so far:</h4>
       {% for a in wa %}
-      <span>{{ a }} {% if loop.index < wa|length %}, {% endif %}</span>
-      {% endfor %}
+      <span>{{ a }} {% if loop.index < wa|length %}, {% endif %}</span> {% endfor %}
     </div>
   </div>
   {% endif %}
