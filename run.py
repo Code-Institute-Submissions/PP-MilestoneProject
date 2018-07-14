@@ -128,7 +128,9 @@ def index():
 
 @app.route('/player/<player_name>')
 def player(player_name):
-    if 'player' in session:
+    player = get_player_detail(player_name, 'data/players.json')
+    
+    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         player = get_player_detail(player_name, 'data/players.json')
         session['qs'] = [x for x in range(len(read_json('data/riddles.json')))]
         session['wrong_answers'] = []
@@ -139,7 +141,9 @@ def player(player_name):
     
 @app.route('/player/<player_name>/riddles')
 def riddles(player_name):
-    if 'player' in session:
+    player = get_player_detail(player_name, 'data/players.json')
+    
+    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         if len(session['qs']) > 0:
             session['q'] = random.choice(session['qs'])
             return redirect(url_for('riddle', player_name=player_name, riddleID=session['q']))
@@ -152,7 +156,7 @@ def riddles(player_name):
 def riddle(player_name, riddleID):
     player = get_player_detail(player_name, 'data/players.json')
     
-    if 'player' in session and session['player'] == player['player_name']:
+    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         # Pick another question if player attempts to use URL to go back to
         #a question already attempted.
         if not(int(riddleID) in session['qs']):
@@ -181,7 +185,7 @@ def riddle(player_name, riddleID):
 def answer(player_name, riddleID, answer):
     player = get_player_detail(player_name, 'data/players.json')
     
-    if 'player' in session and session['player'] == player['player_name']:
+    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         riddle = get_riddle('data/riddles.json', riddleID)
         if correct_answer(riddle, answer):
             session['current_score'] += 1
@@ -201,7 +205,7 @@ def answer(player_name, riddleID, answer):
 def game_finish(player_name):
     player = get_player_detail(player_name, 'data/players.json')
     
-    if 'player' in session and session['player'] == player['player_name']:
+    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
         # Current score from a recently finished game session will be recorded as top scores
         # if and only the current score is higher than top score recorded in file.
         if int(session['current_score']) > int(player['top_score']):
