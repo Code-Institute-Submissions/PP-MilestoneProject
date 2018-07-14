@@ -8,8 +8,8 @@
 <div class="container-fluid" id="login">
 
   <form class="form-inline form-control-lg justify-content-center" method="POST">
-      <input type="text" name="player_name" id="player_name" maxlength="20" placeholder="Player Name" class="col-12 col-md" required />
-      <input type="password" name="password" id="password" maxlength="20" placeholder="Password" class="col-12 col-md" required />
+      <input type="text" name="player_name" id="player_name" maxlength="20" placeholder="Player Name" class="col-12 col-md" required pattern="\S+" title="No white space"/>
+      <input type="password" name="password" id="password" maxlength="20" placeholder="Password" class="col-12 col-md" required pattern="\S+" title="No white space" />
       <button class="btn btn-success btn-lg col-12 col-md" id="login">Game Start!</button>
   </form>
   {% if login_failed %}
