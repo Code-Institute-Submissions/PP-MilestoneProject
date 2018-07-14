@@ -49,6 +49,9 @@
     - Current scores is only relevant when player is playing, hence it will not be stored in data file. Top score otherwise, will update when players make a new record for themselves.
 - Added 'rank' column to leaderboard for better readability.
 
+#### 23:31
+- Hint feature implemented.
+
 ### 11/07/2018
 After review the application will undergo some hugh changes, they are as follow:
 - Player login will require password.
