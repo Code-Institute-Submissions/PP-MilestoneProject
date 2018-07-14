@@ -1,11 +1,41 @@
 {% extends 'base.html' %} {% block content%}
 
-<div class="alert alert-light text-center">
-  <h1 class="display-3">Welcome, {{ player.player_name }}</h1>
-  <h2>Your current score is {{ player.current_score }}</h2>
+<div class="container">
+  <button type="button" class="btn btn-secondary d-xs-block d-sm-none col" data-toggle="modal" data-target="#top-panel">
+  Current Score: {{ session['current_score'] }} Tap for more info
+</button>
+</div>
+
+<div class="modal fade" id="top-panel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title text-center">Session Result</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+      </div>
+      <div class="modal-body text-center">
+        <h1 class="display-3">Hi, {{ session['player'] }}</h1>
+        <h2>Your current score is {{ session['current_score'] }}</h2>
+        <p class="lead">Your challenges begins, answer as many riddles as you can! If you are struggling, you can pass a riddle by submitting a blank answer.</p>
+        <p class="lead">Feel free to headback to your player page at anytime.</p>
+        <a href="{{ url_for('game_finish', player_name=session['player']) }}"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close Window</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop"></div>
+</div>
+
+<div class="alert alert-light text-center d-none d-sm-block">
+  <h1 class="display-3">Hi, {{ session['player'] }}</h1>
+  <h2>Your current score is {{ session['current_score'] }}</h2>
   <p class="lead">Your challenges begins, answer as many riddles as you can! If you are struggling, you can pass a riddle by submitting a blank answer.</p>
   <p class="lead">Feel free to headback to your player page at anytime.</p>
-  <a href="{{ url_for('player', player_name=player.player_name) }}"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
+  <a href="url_for('game_finish', player_name=session['player'])"><button type="button" class="btn btn-warning btn-lg">Back to Player Page</button></a>
 </div>
 
 <div class="container">
@@ -20,9 +50,8 @@
     </div>
   </div>
   <form class="form-inline form-control-lg justify-content-center" method="POST">
-    <label for="answer">Your answer:</label>
-    <input type="text" name="answer" id="answer" maxlength="20"/>
-    <button class="btn btn-success btn-lg riddle-button">Submit Answer</button>
+    <input type="text" name="answer" id="answer" maxlength="20" class="col col-md" placeholder="Your Answer">
+    <button class="btn btn-success btn-lg riddle-button col-md">Submit Answer</button>
   </form>
   
   {% if wa|length > 0 %}

@@ -13,8 +13,8 @@
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    {% if player_access %}
-    <a class="navbar-brand" href="{{ url_for('logout', player_name=player_name) }}">
+    {% if 'player' in session %}
+    <a class="navbar-brand" href="{{ url_for('logout', player_name=session['player']) }}">
     {% else %}
     <a class="navbar-brand" href="{{ url_for('index') }}">
     {% endif %}
@@ -27,11 +27,7 @@
     <div class="collapse navbar-collapse" id="navbarColor02">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          {% if player_access %}
-          <a class="nav-link" href="{{ url_for('player_leaderboard', player_name=player_name) }}">
-          {% else %}
           <a class="nav-link" href="{{ url_for('leaderboard') }}">
-          {% endif %}
             Leaderboard
           </a>
         </li>
