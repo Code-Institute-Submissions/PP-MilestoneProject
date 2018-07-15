@@ -205,3 +205,31 @@ As such, to better illustrate how the application is expected to work, one more 
 tester.post('/', data=dict(player_name = 'dummy_player'), follow_redirects = True)
 ```
 This concept is applicable in several tests as well; so instead of injecting test data directly into data file, they are posted through a test client as how a normal user would do.
+
+### Changes to tests along with rework
+With the rework mentioned in change log, there is also a need to adjust tests so that they are still relevant. Here is a list of the tests changes:
+
+#### Player login
+Since it also require password on top of player name to login, test data needs to change from {player_name: 'dummy_player'} to {player_name: 'dummy_player', password: 'dummy_player'} to reflect that.
+
+#### Test with Flask session in mind
+With the implementation of Flask session, it is necessary to keep in mind that tests should be carried out with a session available. Because of that, there is a need to set a secret key before each test to make sure a session is created properly.
+
+One such example is test_riddles_loads, session variables needs to be set up manually so a simple get request without setup in the test will return the stray.html page. This is due to the fact that correct page will only load if a session exists. To manually set session variables, the following code is used:
+```python
+with self.app.session_transaction() as sess:
+    sess['player'] = 'dummy_player'
+    sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+    sess['wrong_answers'] = []
+    sess['current_score'] = 0
+```
+
+#### New tests for game logic
+As the game logic has changed vastly, there is a need to add new tests to make sure the new game logic works for example, a test is needed to check if the game actually loops through all the question without repeating and ends the game when it has gone through all questions.
+
+The test for game logic does not actually goes through all question as if the application is actually running but rather shows the logic behind the game loop and test is end result (redirected back to player page) is as expected.
+
+To start off, before player starts a game, a list is stored into session. This list is to keep track of how many questions left. Whenever player proceeds (either by passing or by submitting the correct answer), the key representing that question is removed from the list before another key is selected ay random. This allows players to go through all questions in the riddle base without having to repeat any question. Here is a screenshot below to explain the logic visually.
+
+![Visual representation of the logic behind game loop](static/image/test-img-1.jpg)
+
