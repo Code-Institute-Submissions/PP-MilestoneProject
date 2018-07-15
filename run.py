@@ -165,14 +165,13 @@ def riddle(player_name, riddleID):
         # Reassign session['q'] if player access directly with URL
         if str(riddleID) != session['q']:
             session['wrong_answers'] = []
-            session['q'] = int(riddleID)
+            session['q'] = str(riddleID)
         
         riddle = get_riddle('data/riddles.json', riddleID)
         if request.method == "POST":
             if pass_riddle(request.form["answer"]):
                 session['wrong_answers'] = []
-                session['qs'].remove(int(session['q']))
-                print(str(session['qs']))
+                session['qs'].remove(str(session['q']))
                 return redirect(url_for('riddles', player_name=player_name))
             else:
                 return redirect(url_for('answer', player_name=player_name, riddleID=riddleID, answer=request.form["answer"]))
@@ -192,8 +191,7 @@ def answer(player_name, riddleID, answer):
         if correct_answer(riddle, answer):
             session['current_score'] += 1
             session['wrong_answers'] = []
-            session['qs'].remove(int(session['q']))
-            print(str(session['qs']))
+            session['qs'].remove(str(session['q']))
             return redirect(url_for('riddles', player_name=player_name))
         else:
             wrong_answers = session['wrong_answers']
@@ -234,4 +232,4 @@ def logout(player_name):
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=int(os.environ.get('PORT')),
-            debug=True, threaded=True)
+            debug=False, threaded=True)
