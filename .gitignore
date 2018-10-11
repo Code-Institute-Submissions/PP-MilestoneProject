@@ -2,3 +2,4 @@
 data/players.json
 data/active_players.json
 ppenv/
+__pycache__/
