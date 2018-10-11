@@ -1,6 +1,4 @@
 # Practical Python Milestone Project
-<details><summary>Details</summary>
-
 - The aim of this project is to build a web application game that asks players to guess the answer to a pictorial or text-based riddle.
 - The player is presented with an image or text that contains the riddle.
 - Players enter their answer into a textarea and submit their answer using a form.
@@ -8,13 +6,7 @@
 - Multiple players can play an instance of the game at the same time. Users are identified by a unique username.
 - A leaderboard is also available for users to check their top scores and how they fare against other players.
 
-</details>
-
-*****
-
 ## Technical details
-
-<details><summary>Details</summary>
 - The Application will be styled with Bootstrap based theme and aiming for a responsive design.
 - Riddles will be stored as JSON file. Each "riddle" will consists of the riddle - either as a string if it is text-based, or a URL to an image of it is pictorial. Ability to add new riddles from client side is not part of the requirement so should the riddle base requires update, they will be added to the JSON file directly.
 - Due to requirement of displaying users scores, usernames and their scores will have to be stored in a file (likely on JSON format) on the server. Although this requirement can be achieved without having to store the data in a file (i.e. store data in a dictionary at runtime), such data will be lost if the application crashes. It is therefore more preferable to store these data in a file.
@@ -31,10 +23,6 @@
   4. Users can quit the game at any time at which point the flow will start again from step 1.
 - The application will follow a test-driven development strategy. Any details regarding testing will be provided [HERE](#Testing)
 - Flask framework will be used and the application will be deployed using Heroku.
-
-</details>
-
-*****
 
 ## Change Log
 
@@ -108,7 +96,7 @@ Anything not mentioned in this list will remain mostly the same.
 
 #### 15:21
 - Added HTML templates.
-- index.html implemented (UI only). 
+- index.html implemented (UI only).
 - Added run.py (init script for the application) and its test script test_run.py.
 
 
@@ -123,9 +111,9 @@ def write_to_player_json():
     player = {"player_name": "dummy_player", "score": 0}
     with open('data/player.json') as f:
         data = json.load(f)
-    
+
     data.append(player)
-    
+
     with open('data/player.json', 'w') as f:
         json.dump(data, f)
 ```
@@ -145,7 +133,7 @@ The reason why the function was called multiple times is to make sure new data i
 As the function to identify whether or not a player name entered exists in player.json has been implemented, further tests has been put in place to ensure that the application will not create duplicates of player record in player.json. This serves as the first step of implementing the requirement "Multiple players can play an instance of the game at the same time" where players are identified by a unique player name.
 
 ### Logic of processing riddles
-Players are instructed that if they want to pass a riddle, they can do so by submitting a blank answer. This will also in turn saves the effort of implementing code to check "whether a blank answer is the correct answer" or possible bug that may arise by submitting a blank answer. What the application does actually is that when player submits a blank answer, the page reloads and display a new riddle, nothing else. 
+Players are instructed that if they want to pass a riddle, they can do so by submitting a blank answer. This will also in turn saves the effort of implementing code to check "whether a blank answer is the correct answer" or possible bug that may arise by submitting a blank answer. What the application does actually is that when player submits a blank answer, the page reloads and display a new riddle, nothing else.
 
 As for handling POST request, the code will look something like this:
 ```python
@@ -172,9 +160,9 @@ As far as routing test is concerned, both route needs to be tested independently
 On the other hand, in order to simplify testing for sorting scores and displaying them on leaderboard.html, a preset of data is used as follows:
 ```python
 test_data = [
-            {"score": 0, "player_name": "a"}, 
-            {"score": 5, "player_name": "b"}, 
-            {"score": 3, "player_name": "c"}, 
+            {"score": 0, "player_name": "a"},
+            {"score": 5, "player_name": "b"},
+            {"score": 3, "player_name": "c"},
             {"score": 2, "player_name": "d"}]
 write_json('data/player.json', test_data)
 ```
@@ -232,4 +220,3 @@ The test for game logic does not actually goes through all question as if the ap
 To start off, before player starts a game, a list is stored into session. This list is to keep track of how many questions left. Whenever player proceeds (either by passing or by submitting the correct answer), the key representing that question is removed from the list before another key is selected ay random. This allows players to go through all questions in the riddle base without having to repeat any question. Here is a screenshot below to explain the logic visually.
 
 ![Visual representation of the logic behind game loop](static/image/test-img-1.jpg)
-
