@@ -188,6 +188,10 @@ def answer(player_name, riddleID, answer):
 
     if 'player' in session and session['player'] == player['player_name'] and player['active']:
         riddle = get_riddle('data/riddles.json', riddleID)
+
+        if str(riddleID) not in session['qs']:
+            return redirect(url_for('riddles', player_name=player_name))
+            
         if correct_answer(riddle, answer):
             session['current_score'] += 1
             session['wrong_answers'] = []
