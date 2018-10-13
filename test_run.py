@@ -1,4 +1,6 @@
 from run import *
+import datetime
+from datetime import datetime as dt
 import unittest
 
 #Helper function to clear out players.json
@@ -38,6 +40,18 @@ class TestRoute(unittest.TestCase):
         response = self.app.get('/', content_type="html/text")
         self.assertTrue(b'Riddle Me These' in response.data)
 
+    # To test if player is redirected back to their player's page is they are already logged in.
+    def test_index_redirects(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        response = self.app.get('/', follow_redirects = True)
+        self.assertTrue(b'Welcome, dummy_player' in response.data)
+
+    # To test if password are validated properly.
+    def test_password_check(self):
+        add_new_player('dummy_player', 'dummy_player', 'data/players.json')
+        response = self.app.post('/', data=dict(player_name = 'dummy_player', password = 'wrong password'), follow_redirects = True)
+        self.assertTrue(b"Login failed. Please make sure you have entered the details correctly." in response.data)
+
     #To test if page loads correctly (player.html)
     def test_player_loads(self):
         response = self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
@@ -75,6 +89,18 @@ class TestRoute(unittest.TestCase):
         self.assertTrue(b'Your challenges begins,' in response.data)
         self.assertTrue(b'water' in response.data)
 
+    # to test fall back logic when player skipped 'riddles' route in a game loop - extension to test above.
+    def test_fall_back(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['wrong_answers'] = []
+            sess['current_score'] = 0
+        response = self.app.get('player/dummy_player/riddles/0', follow_redirects = True)
+
+        self.assertEqual(response.status_code, 200)
+
     #To test if page loads correctly (leaderboard.html without player data)
     def test_leaderboard_loads(self):
         response = self.app.get('leaderboard')
@@ -83,7 +109,7 @@ class TestRoute(unittest.TestCase):
 
     #To test if page loads correctly (leaderboard.html with player data)
     def test_leaderboard_loads_with_player_data(self):
-        test_data = [{"player_name": "dummy_player", "password": "dummy_player", "top_score": 0, "logged_in": False}]
+        test_data = [{"player_name": "dummy_player", "password": "dummy_player", "top_score": 0, "active": False, "last_active": "2018-01-01 00:00:00"}]
         write_json('data/players.json', test_data)
         response = self.app.get('leaderboard')
         self.assertEqual(response.status_code, 200)
@@ -106,6 +132,15 @@ class TestRoute(unittest.TestCase):
         self.assertTrue(b'Hold on a second!' in resp4.data)
         self.assertTrue(b'Hold on a second!' in resp5.data)
         self.assertTrue(b'Hold on a second!' in resp6.data)
+
+    # To test if player can logout properly
+    def test_logout(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        player = get_player_detail('dummy_player', 'data/players.json')
+        self.assertTrue(player['active'] == True)
+        self.app.get('player/dummy_player/logout')
+        player = get_player_detail('dummy_player', 'data/players.json')
+        self.assertTrue(player['active'] == False)
 
 class TestJsonManipulation(unittest.TestCase):
     """
@@ -138,7 +173,7 @@ class TestJsonManipulation(unittest.TestCase):
 
     #To test if data is read from player.json as expected
     def test_read_json(self):
-        expected_data = [{'player_name': 'dummy_player', 'top_score': 0, 'logged_in': False, 'password': 'dummy_player'}]
+        expected_data = [{"player_name": 'dummy_player', "top_score": 0, "password": 'dummy_player', "active": False, "last_active": "2018-01-01 00:00:00"}]
         add_new_player('dummy_player', 'dummy_player', 'data/players.json')
         data = read_json('data/players.json')
         self.assertEqual(data, expected_data)
@@ -180,11 +215,24 @@ class TestRiddles(unittest.TestCase):
     def tearDownClass(cls):
         reset_json('data/players.json')
 
-    #To test if application can tell if player submitted a correct answer or not
+    #To test if the function 'correct_answer' behaves as expected
     def test_answer_riddle(self):
         riddle = get_riddle('data/riddles.json', "0")
         self.assertTrue(correct_answer(riddle, "ice"))
         self.assertFalse(correct_answer(riddle, "something else"))
+
+    #To test if application can tell if player submitted a correct answer or not
+    def test_player_answer_riddle(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['q'] = '0'
+            sess['wrong_answers'] = []
+            sess['current_score'] = 0
+        response = self.app.post('player/dummy_player/riddles/0', data={'answer': 'ice'}, follow_redirects = True)
+        self.assertFalse(b"I AM THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?" in response.data)
+        self.assertTrue(b'Your current score is 1' in response.data)
 
     #To test if current score is updated correctly
     def test_update_current_score(self):
@@ -195,8 +243,21 @@ class TestRiddles(unittest.TestCase):
             sess['q'] = '0'
             sess['wrong_answers'] = []
             sess['current_score'] = 0
-        resp = self.app.get('player/dummy_player/riddles/0/ice', follow_redirects = True)
-        self.assertTrue(b'Your current score is 1' in resp.data)
+        response = self.app.get('player/dummy_player/riddles/0/ice', follow_redirects = True)
+        self.assertTrue(b'Your current score is 1' in response.data)
+
+    # To test if top scores are update correctly
+    def test_update_top_score(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['q'] = '0'
+            sess['wrong_answers'] = []
+            sess['current_score'] = 1 # Assumed player answered 1 question correctly and decides to end the game.
+        response = self.app.get('player/dummy_player/game_finish', follow_redirects = True)
+        player = get_player_detail('dummy_player', 'data/players.json')
+        self.assertEqual(player['top_score'], 1)
 
     #To test if wrong answers are displayed properly
     def test_display_wrong_answers(self):
@@ -228,6 +289,46 @@ class TestRiddles(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(b'Here is the result of your last session:' in response.data)
 
+    # To test if game prevents player from accessing the same question within a game loop
+    def test_prevent_access_duplicate(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['q'] = '0'
+            sess['wrong_answers'] = []
+            sess['current_score'] = 0
+
+        self.app.get('player/dummy_player/riddles/0/ice', follow_redirects=True)
+        response = self.app.get('player/dummy_player/riddles/0', follow_redirects=True)
+        self.assertFalse(b"I AM THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?" in response.data)
+
+    # To test if game prevents player from actually answering the same question within a game loop through URL
+    def test_prevent_answer_duplicate(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['q'] = '0'
+            sess['wrong_answers'] = []
+            sess['current_score'] = 0
+
+        self.app.get('player/dummy_player/riddles/0/ice', follow_redirects=True)
+        response = self.app.get('player/dummy_player/riddles/0/ice', follow_redirects=True)
+        self.assertFalse(b"I AM THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?" in response.data)
+
+    # To test if game proceeds as expected if player decides to skip a question
+    def test_skip_question(self):
+        self.app.post('/', data=dict(player_name = 'dummy_player', password = 'dummy_player'), follow_redirects = True)
+        with self.app.session_transaction() as sess:
+            sess['player'] = 'dummy_player'
+            sess['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
+            sess['q'] = '0'
+            sess['wrong_answers'] = []
+            sess['current_score'] = 0
+        response = self.app.post('player/dummy_player/riddles/0', data={'answer': ''}, follow_redirects=True)
+        self.assertFalse(b"I AM THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?" in response.data)
+
 class TestLeaderboard(unittest.TestCase):
     """
     Test class related to leaderboard
@@ -248,10 +349,10 @@ class TestLeaderboard(unittest.TestCase):
     #To test if scores are sorted in descending order
     def test_scores_sorted(self):
         test_data = [
-            {"top_score": 0, "player_name": "a", "password": "password", "logged_in": False},
-            {"top_score": 5, "player_name": "b", "password": "password", "logged_in": False},
-            {"top_score": 3, "player_name": "c", "password": "password", "logged_in": False},
-            {"top_score": 2, "player_name": "d", "password": "password", "logged_in": False}]
+            {"top_score": 0, "player_name": "a", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 5, "player_name": "b", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 3, "player_name": "c", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 2, "player_name": "d", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"}]
         write_json('data/players.json', test_data)
         html_out = str(self.app.get('leaderboard').data)
         self.assertTrue(html_out.index("<td>b</td>") < html_out.index("<td>c</td>"))
@@ -261,15 +362,15 @@ class TestLeaderboard(unittest.TestCase):
     #To test if score is highlighted when player is logged in
     def test_highlight_player_score(self):
         test_data = [
-            {"top_score": 0, "player_name": "a", "password": "password", "logged_in": False},
-            {"top_score": 5, "player_name": "b", "password": "password", "logged_in": False},
-            {"top_score": 3, "player_name": "c", "password": "password", "logged_in": False},
-            {"top_score": 2, "player_name": "d", "password": "password", "logged_in": False}]
+            {"top_score": 0, "player_name": "a", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 5, "player_name": "b", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 3, "player_name": "c", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"},
+            {"top_score": 2, "player_name": "d", "password": "password", "active": False, "last_active": "2018-01-01 00:00:00"}]
         write_json('data/players.json', test_data)
         self.app.post('/', data=dict(player_name = 'b', password = 'password'), follow_redirects = True)
-        resp = self.app.get('leaderboard')
-        html_out = str(resp.data)
-        self.assertTrue(b'<tr class="table-success" id="player_score">' in resp.data)
+        response = self.app.get('leaderboard')
+        html_out = str(response.data)
+        self.assertTrue(b'<tr class="table-success" id="player_score">' in response.data)
         self.assertTrue(html_out.index('<tr class="table-success" id="player_score">') < html_out.index("<td>b</td>"))
 
 class TestMultipleUsers(unittest.TestCase):

@@ -163,7 +163,7 @@ def riddle(player_name, riddleID):
             return redirect(url_for('riddles', player_name=player_name))
 
         # Reassign session['q'] if player access directly with URL
-        if str(riddleID) != session['q']:
+        if str(riddleID) != session['q']: # pragma: no cover
             session['wrong_answers'] = []
             session['q'] = str(riddleID)
 
@@ -191,7 +191,7 @@ def answer(player_name, riddleID, answer):
 
         if str(riddleID) not in session['qs']:
             return redirect(url_for('riddles', player_name=player_name))
-            
+
         if correct_answer(riddle, answer):
             session['current_score'] += 1
             session['wrong_answers'] = []
@@ -233,7 +233,7 @@ def logout(player_name):
     session.pop('player', None)
     return redirect('/')
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     if os.environ.get('IP') and os.environ.get('PORT'):
         app.run(host=os.environ.get('IP'),
                 port=int(os.environ.get('PORT')),
