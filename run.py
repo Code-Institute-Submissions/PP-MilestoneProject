@@ -1,5 +1,7 @@
 import os
 import json
+import datetime
+from datetime import datetime as dt
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 import random
 from operator import itemgetter
@@ -26,7 +28,7 @@ def get_player_detail(player_name, file_name):
     return False
 
 def add_new_player(player_name, password, file_name):
-    player = {"player_name": player_name, "top_score": 0, "password": password, "logged_in": False}
+    player = {"player_name": player_name, "top_score": 0, "password": password, "active": False, "last_active": "2018-01-01 00:00:00"}
     players = read_json('data/players.json')
     players.append(player)
     write_json(file_name, players)
@@ -37,13 +39,23 @@ def change_online_status(player_name, file_name, status):
     data = read_json(file_name)
     for d in data:
         if d["player_name"] == player_name:
-            d["logged_in"] = status
+            d["active"] = status
             write_json('data/players.json', data)
 
-def all_log_off(file_name):
+def log_last_active(player_name, file_name):
     data = read_json(file_name)
     for d in data:
-        d["logged_in"] = False
+        if d["player_name"] == player_name:
+            d["last_active"] = dt.now().strftime('%Y-%m-%d %H:%M:%S')
+            write_json('data/players.json', data)
+
+def log_off_inactive(file_name):
+    data = read_json(file_name)
+    now = dt.now()
+    for d in data:
+        last_active = dt.strptime(d['last_active'], '%Y-%m-%d %H:%M:%S')
+        if now - last_active > datetime.timedelta(minutes=10):
+            d['active'] = False
         write_json('data/players.json', data)
 
 def get_riddleID(file_name):
@@ -90,10 +102,15 @@ def clean_wrong_answers(player_name):
 @app.before_first_request
 def startup():
     try:
-        all_log_off('data/players.json')
-        session.pop('player', None)
+        read_json('data/players.json')
+        if 'player' in session:
+            session.pop('player', None)
     except:
         write_json('data/players.json', [])
+
+@app.before_request
+def before_request():
+    log_off_inactive('data/players.json')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -103,15 +120,17 @@ def index():
         if get_player_detail(request.form['player_name'], 'data/players.json') == False:
             # Action to take if it's a new player
             player = add_new_player(request.form['player_name'], request.form['password'], 'data/players.json')
+            log_last_active(request.form['player_name'], 'data/players.json')
             change_online_status(request.form['player_name'], 'data/players.json', True)
             session['player'] = player['player_name']
             return redirect(url_for('player', player_name=request.form['player_name']))
         else:
             # Action to take if it's a returning player
             player = get_player_detail(request.form['player_name'], 'data/players.json')
-            if player['logged_in']:
+            if player['active']:
                 return render_template("index.html", logged_in=True)
             elif request.form['password'] == player['password']:
+                log_last_active(request.form['player_name'], 'data/players.json')
                 change_online_status(request.form['player_name'], 'data/players.json', True)
                 session['player'] = player['player_name']
                 return redirect(url_for('player', player_name=request.form['player_name']))
@@ -128,7 +147,7 @@ def index():
 def player(player_name):
     player = get_player_detail(player_name, 'data/players.json')
 
-    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
+    if 'player' in session and session['player'] == player['player_name'] and player['active']:
         player = get_player_detail(player_name, 'data/players.json')
         session['qs'] = [str(x) for x in range(len(read_json('data/riddles.json')))]
         session['wrong_answers'] = []
@@ -141,7 +160,7 @@ def player(player_name):
 def riddles(player_name):
     player = get_player_detail(player_name, 'data/players.json')
 
-    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
+    if 'player' in session and session['player'] == player['player_name'] and player['active']:
         if len(session['qs']) > 0:
             session['q'] = random.choice(session['qs'])
             return redirect(url_for('riddle', player_name=player_name, riddleID=session['q']))
@@ -154,7 +173,7 @@ def riddles(player_name):
 def riddle(player_name, riddleID):
     player = get_player_detail(player_name, 'data/players.json')
 
-    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
+    if 'player' in session and session['player'] == player['player_name'] and player['active']:
         # Pick another question if player attempts to use URL to go back to
         #a question already attempted.
         if str(riddleID) not in session['qs']:
@@ -184,7 +203,7 @@ def riddle(player_name, riddleID):
 def answer(player_name, riddleID, answer):
     player = get_player_detail(player_name, 'data/players.json')
 
-    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
+    if 'player' in session and session['player'] == player['player_name'] and player['active']:
         riddle = get_riddle('data/riddles.json', riddleID)
         if correct_answer(riddle, answer):
             session['current_score'] += 1
@@ -203,7 +222,7 @@ def answer(player_name, riddleID, answer):
 def game_finish(player_name):
     player = get_player_detail(player_name, 'data/players.json')
 
-    if 'player' in session and session['player'] == player['player_name'] and player['logged_in']:
+    if 'player' in session and session['player'] == player['player_name'] and player['active']:
         # Current score from a recently finished game session will be recorded as top scores
         # if and only the current score is higher than top score recorded in file.
         if int(session['current_score']) > int(player['top_score']):
