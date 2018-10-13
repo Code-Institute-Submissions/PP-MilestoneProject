@@ -152,6 +152,10 @@ def riddles(player_name):
 def riddle(player_name, riddleID):
     player = get_player_detail(player_name, 'data/players.json')
 
+    # fall back logic if player skipped the 'riddles' route in a game loop
+    if 'q' not in session:
+        session['q'] = str(riddleID)
+
     if 'player' in session and session['player'] == player['player_name'] and player['active']:
         # Pick another question if player attempts to use URL to go back to
         #a question already attempted.
