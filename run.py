@@ -95,8 +95,6 @@ def startup():
     except:
         write_json('data/players.json', [])
 
-
-
 @app.route('/', methods=['GET', 'POST'])
 def index():
 
