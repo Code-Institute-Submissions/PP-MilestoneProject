@@ -58,10 +58,6 @@ def log_off_inactive(file_name):
             d['active'] = False
         write_json('data/players.json', data)
 
-def get_riddleID(file_name):
-    data = read_json('data/riddles.json')
-    return "Q" + str(random.randint(1, len(data)))
-
 def get_riddle(file_name, ID):
     data = read_json('data/riddles.json')
     for d in data:
@@ -81,29 +77,12 @@ def update_score(player_name, score, file_name):
             d["top_score"] = score
             write_json('data/players.json', data)
 
-def add_wrong_answer(file_name, answer):
-    with open(file_name, 'a') as f:
-        f.writelines(answer + "\n")
-
-def get_wrong_answers(file_name):
-    wa = []
-    with open(file_name, 'r') as f:
-        wa = f.readlines()
-    return wa
-
-def clean_wrong_answers(player_name):
-    file_name = "data/" + player_name + "_wa.txt"
-    if os.path.isfile(file_name):
-        os.remove(file_name)
-    else:
-        return
-
 # Clear sessions and prepare players.json when application starts for the first time.
 @app.before_first_request
 def startup():
     try:
         read_json('data/players.json')
-        if 'player' in session:
+        if 'player' in session: # pragma: no cover
             session.pop('player', None)
     except:
         write_json('data/players.json', [])
