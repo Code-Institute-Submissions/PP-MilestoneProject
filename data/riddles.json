@@ -1,7 +1,7 @@
 [{
     "ID": "0",
     "type": "text",
-    "Q": "I AM THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?",
+    "Q": "I\u2019M THE SON OF WATER BUT WHEN I RETURN TO WATER. I DIE. WHO AM I?",
     "A": ["Ice"],
     "H": "What is made from water and disappears in water?"
   },
@@ -15,7 +15,7 @@
   {
     "ID": "2",
     "type": "text",
-    "Q": "DAVID’S FATHER HAS THREE SONS: SNAP, CRACKLE AND ?",
+    "Q": "DAVID\u2019S FATHER HAS THREE SONS: SNAP, CRACKLE AND ?",
     "A": ["David"],
     "H": "'David's' father has three sons."
   },
