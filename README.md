@@ -26,6 +26,9 @@ The flow above serves as the main loop of this web app. Users can continue to lo
 - Add new riddles from within the app: in the case of expanding the library of riddles, new riddles can be added directly to the JSON file storing the riddles. However, this means that the web app needs to be re-deployed every time new riddles are added. This is very costly and should be avoided if possible. As a countermeasure a feature to add new riddles from within the app could be implemented. Furthermore, by making this feature available to all users it could help expanding the riddles library.
 
 ## Technologies Used
+- [HTML](https://www.w3.org/html/), [CSS](https://www.w3.org/Style/CSS/), [JavaScript](https://www.javascript.com/), [Python](https://www.python.org/)
+	- Languages used for this project.
+	- In particular, Python is used exclusively for most of the logic in this project.
 - [Flask](http://flask.pocoo.org/): Used as the framework of this project.
 - [Bootstrap 4.0](https://getbootstrap.com/)
 	- Toolkit for frontend styling. This is used in conjunction with custom CSS code to provide a unified style throughout different page of the web app.
